@@ -2,6 +2,9 @@ package com.example.neopidorapp
 
 import android.os.Bundle
 import android.os.PersistableBundle
+import android.util.Log
+import android.view.View
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.neopidorapp.databinding.ActivityCallBinding
 import com.example.neopidorapp.models.MessageModel
@@ -10,8 +13,11 @@ import com.example.neopidorapp.util.PeerConnectionObserver
 import org.webrtc.IceCandidate
 import org.webrtc.MediaStream
 import org.webrtc.PeerConnection
+import org.webrtc.SessionDescription
 
-class CallActivity: AppCompatActivity(), NewMessageInterface {
+private const val TAG = "CallActivity"
+
+class CallActivity : AppCompatActivity(), NewMessageInterface {
 
     private val binding by lazy { ActivityCallBinding.inflate(layoutInflater) }
     private var userName: String? = null
@@ -28,7 +34,9 @@ class CallActivity: AppCompatActivity(), NewMessageInterface {
     private fun init() {
         userName = intent.getStringExtra("username")
         socketRepo = SocketRepo(this@CallActivity)
-        userName?.let { socketRepo?.initSocket(it) }
+        userName?.let {
+            socketRepo?.initSocket(it)
+        }
         rtcClient = RTCClient(
             application, // we can just write "application" cause we're inside of the Activity
             userName!!,
@@ -44,11 +52,98 @@ class CallActivity: AppCompatActivity(), NewMessageInterface {
             }
         )
 
-        rtcClient?.initializeSurfaceView(binding.localView)
-        rtcClient?.startLocalVideo(binding.localView)
+        binding.apply {
+            callBtn.setOnClickListener {
+                socketRepo?.sendMessageToSocket(
+                    MessageModel(
+                        "start_call",
+                        userName,
+                        targetUserNameEt.text.toString(),
+                        null
+                    )
+                )
+            }
+        }
     }
 
     override fun onNewMessage(message: MessageModel) {
-        // todo
+        Log.d(TAG, "onNewMessage: $message")
+        when (message.type) {
+            "call_response" -> {
+                if (message.data == "user is not online") {
+                    runOnUiThread { // we have to run it on the UI thread because we're on the Socket thread
+                        Toast.makeText(this, "user is not reachable", Toast.LENGTH_LONG).show()
+                    }
+                } else {
+                    runOnUiThread { // we have to run it on the UI thread because we're on the Socket thread
+                        setWhoToCallLayoutGone()
+                        setCallLayoutVisible()
+                        binding.apply {
+                            rtcClient?.initializeSurfaceView(localView)
+                            rtcClient?.initializeSurfaceView(remoteView)
+                            rtcClient?.startLocalVideo(localView)
+                            rtcClient?.call(targetUserNameEt.text.toString())
+                        }
+                    }
+                }
+            }
+            "offer_received" -> {
+                runOnUiThread {
+                    setIncomingCallLayoutVisible()
+                    binding.apply {
+                        incomingNameTV.text = "${message.name.toString()} is calling you"
+                        acceptButton.setOnClickListener {
+                            setIncomingCallLayoutGone()
+                            setCallLayoutVisible()
+                            setWhoToCallLayoutGone()
+
+                            rtcClient?.initializeSurfaceView(localView)
+                            rtcClient?.initializeSurfaceView(remoteView)
+                            rtcClient?.startLocalVideo(localView)
+                            val remoteSession = SessionDescription(
+                                SessionDescription.Type.OFFER,
+                                message.data.toString()
+                            )
+                            rtcClient?.onRemoteSessionReceived(remoteSession)
+                            rtcClient?.answer(message.name!!)
+                        }
+                        rejectButton.setOnClickListener {
+                            setIncomingCallLayoutGone()
+                        }
+                    }
+                }
+            }
+            "answer_received" -> {
+                val session = SessionDescription(
+                    SessionDescription.Type.ANSWER,
+                    message.data.toString()
+                )
+                rtcClient?.onRemoteSessionReceived(session)
+            }
+        }
+    }
+
+    private fun setIncomingCallLayoutGone() {
+        binding.incomingCallLayout.visibility = View.GONE
+    }
+
+    private fun setIncomingCallLayoutVisible() {
+        binding.incomingCallLayout.visibility = View.VISIBLE
+    }
+
+    private fun setCallLayoutGone() {
+        binding.callLayout.visibility = View.GONE
+    }
+
+    private fun setCallLayoutVisible() {
+        binding.callLayout.visibility = View.VISIBLE
+    }
+
+    private fun setWhoToCallLayoutGone() {
+        binding.whoToCallLayout.visibility = View.GONE
+    }
+
+    private fun setWhoToCallLayoutVisible() {
+        binding.whoToCallLayout.visibility = View.VISIBLE
     }
 }
