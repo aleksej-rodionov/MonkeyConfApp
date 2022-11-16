@@ -180,7 +180,7 @@ class CallActivity : AppCompatActivity(), NewMessageInterface {
                         rejectButton.setOnClickListener {
                             setIncomingCallLayoutGone()
                         }
-                        binding.remoteViewLoading.visibility = View.GONE
+                        remoteViewLoading.visibility = View.GONE
                     }
                 }
             }
