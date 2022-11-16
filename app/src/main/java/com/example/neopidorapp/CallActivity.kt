@@ -11,6 +11,7 @@ import com.example.neopidorapp.models.IceCandidateModel
 import com.example.neopidorapp.models.MessageModel
 import com.example.neopidorapp.util.NewMessageInterface
 import com.example.neopidorapp.util.PeerConnectionObserver
+import com.example.neopidorapp.util.RTCAudioManager
 import com.google.gson.Gson
 import org.webrtc.IceCandidate
 import org.webrtc.MediaStream
@@ -27,6 +28,10 @@ class CallActivity : AppCompatActivity(), NewMessageInterface {
     private var rtcClient: RTCClient? = null
     private var target: String = ""
     private val gson = Gson()
+    private var isMute = false
+    private var isCameraPaused = false
+    private val rtcAudioManager by lazy { RTCAudioManager.create(this) } // todo look over this class
+    private var isSpeakerMode = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -68,6 +73,8 @@ class CallActivity : AppCompatActivity(), NewMessageInterface {
             }
         )
 
+        rtcAudioManager.setDefaultAudioDevice(RTCAudioManager.AudioDevice.SPEAKER_PHONE)
+
         binding.apply {
             callBtn.setOnClickListener {
                 socketRepo?.sendMessageToSocket(
@@ -79,6 +86,51 @@ class CallActivity : AppCompatActivity(), NewMessageInterface {
                     )
                 )
                 target = targetUserNameEt.text.toString()
+            }
+
+            switchCameraButton.setOnClickListener {
+                rtcClient?.switchCamera()
+            }
+
+            micButton.setOnClickListener {
+                if (isMute){
+                    isMute = false
+                    micButton.setImageResource(R.drawable.ic_baseline_mic_off_24)
+                }else{
+                    isMute = true
+                    micButton.setImageResource(R.drawable.ic_baseline_mic_24)
+                }
+                rtcClient?.toggleAudio(isMute)
+            }
+
+            videoButton.setOnClickListener {
+                if (isCameraPaused) {
+                    isCameraPaused = false
+                    videoButton.setImageResource(R.drawable.ic_baseline_videocam_off_24)
+                } else {
+                    isCameraPaused = true
+                    videoButton.setImageResource(R.drawable.ic_baseline_videocam_24)
+                }
+                rtcClient?.toggleCamera(isCameraPaused)
+            }
+
+            audioOutputButton.setOnClickListener {
+                if (isSpeakerMode) {
+                    isSpeakerMode = false
+                    audioOutputButton.setImageResource(R.drawable.ic_baseline_hearing_24)
+                    rtcAudioManager.setDefaultAudioDevice(RTCAudioManager.AudioDevice.EARPIECE)
+                } else {
+                    isSpeakerMode = true
+                    audioOutputButton.setImageResource(R.drawable.ic_baseline_speaker_up_24)
+                    rtcAudioManager.setDefaultAudioDevice(RTCAudioManager.AudioDevice.SPEAKER_PHONE)
+                }
+            }
+
+            endCallButton.setOnClickListener {
+                setCallLayoutGone()
+                setWhoToCallLayoutVisible()
+                setIncomingCallLayoutGone()
+                rtcClient?.endCall()
             }
         }
     }
