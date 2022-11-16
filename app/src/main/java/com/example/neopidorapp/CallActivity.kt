@@ -7,9 +7,11 @@ import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.neopidorapp.databinding.ActivityCallBinding
+import com.example.neopidorapp.models.IceCandidateModel
 import com.example.neopidorapp.models.MessageModel
 import com.example.neopidorapp.util.NewMessageInterface
 import com.example.neopidorapp.util.PeerConnectionObserver
+import com.google.gson.Gson
 import org.webrtc.IceCandidate
 import org.webrtc.MediaStream
 import org.webrtc.PeerConnection
@@ -23,6 +25,8 @@ class CallActivity : AppCompatActivity(), NewMessageInterface {
     private var userName: String? = null
     private var socketRepo: SocketRepo? = null
     private var rtcClient: RTCClient? = null
+    private var target: String = ""
+    private val gson = Gson()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,10 +48,22 @@ class CallActivity : AppCompatActivity(), NewMessageInterface {
             object : PeerConnectionObserver() {
                 override fun onIceCandidate(p0: IceCandidate?) {
                     super.onIceCandidate(p0)
+                    rtcClient?.addIceCandidate(p0) // we add an ICE Candidate...
+                    // ... and it's time to send this ICE Candidate to our peer:
+                    // SENDING ICE CANDIDATE:
+                    val candidate = hashMapOf(
+                        "sdpMid" to p0?.sdpMid,
+                        "sdpMLineIndex" to p0?.sdpMLineIndex,
+                        "sdpCandidate" to p0?.sdp
+                    )
+                    socketRepo?.sendMessageToSocket(
+                        MessageModel("ice_candidate", userName, target, candidate)
+                    )
                 }
 
                 override fun onAddStream(p0: MediaStream?) {
                     super.onAddStream(p0)
+                    p0?.videoTracks?.get(0)?.addSink(binding.remoteView)
                 }
             }
         )
@@ -62,6 +78,7 @@ class CallActivity : AppCompatActivity(), NewMessageInterface {
                         null
                     )
                 )
+                target = targetUserNameEt.text.toString()
             }
         }
     }
@@ -106,10 +123,12 @@ class CallActivity : AppCompatActivity(), NewMessageInterface {
                             )
                             rtcClient?.onRemoteSessionReceived(remoteSession)
                             rtcClient?.answer(message.name!!)
+                            target = message.name!!
                         }
                         rejectButton.setOnClickListener {
                             setIncomingCallLayoutGone()
                         }
+                        binding.remoteViewLoading.visibility = View.GONE
                     }
                 }
             }
@@ -119,6 +138,29 @@ class CallActivity : AppCompatActivity(), NewMessageInterface {
                     message.data.toString()
                 )
                 rtcClient?.onRemoteSessionReceived(session)
+                runOnUiThread {
+                    binding.remoteViewLoading.visibility = View.GONE
+                }
+            }
+            "ice_candidate" -> {
+                // RECEIVING ICE CANDIDATE:
+                runOnUiThread {
+                    try {
+                        val receivedIceCandidate = gson.fromJson(
+                            gson.toJson(message.data),
+                            IceCandidateModel::class.java
+                        )
+                        rtcClient?.addIceCandidate(
+                            IceCandidate(
+                                receivedIceCandidate.sdpMid,
+                                Math.toIntExact(receivedIceCandidate.sdpMLineIndex.toLong()),
+                                receivedIceCandidate.sdpCandidate
+                            )
+                        )
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
+                }
             }
         }
     }

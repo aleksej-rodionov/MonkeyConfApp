@@ -8,6 +8,16 @@ class RTCClient(
     private val application: Application,
     private val username: String,
     private val socketRepo: SocketRepo,
+
+    /**
+     * This Observer object below, that we've passed then to our WebRtc Client,
+     * will notify whenever there is an ICE Candidate.
+     *
+     * (In previous video we've learned how to create an Offer or an Answer
+     * and exchange their SessionDescription to each other.
+     * But in this video we are going to learn how to exchange the ICE Candidates.
+     * So, whenever a local SessionDescription is set, there will be some ICE Candidate.)
+     */
     private val observer: PeerConnection.Observer
 ) {
 
@@ -192,6 +202,10 @@ class RTCClient(
             },
             mediaConstraints
         )
+    }
+
+    fun addIceCandidate(p0: IceCandidate?) {
+        peerConnection?.addIceCandidate(p0)
     }
 }
 
