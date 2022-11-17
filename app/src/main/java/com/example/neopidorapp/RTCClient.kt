@@ -4,10 +4,12 @@ import android.app.Application
 import com.example.neopidorapp.models.MessageModel
 import org.webrtc.*
 
+// todo structure refactor: you can try leave it in presentation layer and see if it's ok
 class RTCClient(
     private val application: Application,
     private val username: String,
-    private val socketRepo: SocketRepo,
+    private val socketRepo: SocketRepo, // todo here pass interactor (and call its functions)
+    // instead of repo
 
     /**
      * This Observer object below, that we've passed then to our WebRtc Client,
@@ -201,6 +203,7 @@ class RTCClient(
                                 "type" to desc?.type
                             )
                             socketRepo.sendMessageToSocket(
+                                // todo fix typo here and in server
                                 MessageModel("create_answeer", username, targetName, answer)
                             )
                         }

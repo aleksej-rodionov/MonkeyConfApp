@@ -15,7 +15,10 @@ import androidx.annotation.Nullable
 import org.webrtc.ThreadUtils
 import java.util.*
 
-// todo research what does this class do
+/**
+ * this class is responsible for choosing audio output means
+ * todo structure refactor: this class goes to presentation layer and to be used in ViewModel
+ */
 class RTCAudioManager(context: Context) {
     /**
      * AudioDevice is the names of possible audio devices that we currently

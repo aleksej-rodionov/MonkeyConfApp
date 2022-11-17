@@ -11,6 +11,9 @@ import kotlin.Exception
 
 private const val TAG = "SocketRepo"
 
+
+// todo structure refactor: this goes to domain layer (interface);
+// and to data layer (this concrete implementation)
 class SocketRepo(
     private val newMessageInterface: NewMessageInterface
 ) {

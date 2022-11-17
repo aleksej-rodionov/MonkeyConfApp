@@ -3,6 +3,9 @@ package com.example.neopidorapp.util
 import org.webrtc.*
 
 /**
+ * todo structure refactor: this class stays in the presentation layer as long as the webRtcClient,
+ * where its implementation will be passed, stays in the presentation layer as well.
+ *
  * this open class is created in order to avoid implementing all these numerous functions
  * when instantiating RTCClient in CallActivity.
  * We just use this class and implement only 2 functions we really need instead.

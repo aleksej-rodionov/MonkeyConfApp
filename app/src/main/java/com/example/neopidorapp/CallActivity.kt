@@ -135,6 +135,9 @@ class CallActivity : AppCompatActivity(), NewMessageInterface {
         }
     }
 
+    // todo structure refactor: think where this implementation of function goes?
+    // it stays on presentation layer for it calls changes on your UI
+    // so it stays in ViewModel.
     override fun onNewMessage(message: MessageModel) {
         Log.d(TAG, "onNewMessage: $message")
         when (message.type) {
