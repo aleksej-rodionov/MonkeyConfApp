@@ -3,9 +3,9 @@ package com.example.neopidorapp.feature_calls.data.remote
 import android.util.Log
 import com.example.neopidorapp.feature_calls.data.remote.model.MessageDto
 import com.example.neopidorapp.feature_calls.domain.model.MessageModel
+import com.example.neopidorapp.shared.Resource
 import com.google.gson.Gson
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.*
 import org.java_websocket.client.WebSocketClient
 import org.java_websocket.handshake.ServerHandshake
 import java.net.URI
@@ -16,11 +16,17 @@ class SocketRepoImpl(
 
 ): SocketRepo {
 
+    private val _incomingMessage: MutableSharedFlow<String> = MutableSharedFlow()
+    private val incomingMessage: SharedFlow<String> = _incomingMessage.asSharedFlow()
+    private suspend fun emitNewMessage(message: String) {
+        _incomingMessage.emit(message)
+    }
+
     private var webSocket: WebSocketClient? = null
     private var userName: String? = null
     private val gson = Gson()
 
-    override fun initSocket(username: String) {
+    override suspend fun initSocket(username: String): Resource<Unit> {
         userName = username
 
         // for emulators: 10.0.2.2:3000
@@ -44,7 +50,8 @@ class SocketRepoImpl(
             override fun onMessage(message: String?) {
                 // todo here I want to emit new MessageModel through some new Flow<MessageModel>
                 try {
-                    incomingMessageFlow(message)
+
+//                    incomingMessageFlow(message)
                 } catch (e: Exception) {
                     e.printStackTrace()
                 }
@@ -59,27 +66,41 @@ class SocketRepoImpl(
             }
         }
 
-        webSocket?.connect() // here we connect our client to our webSocket
+        return try {
+            webSocket?.connect() // here we connect our client to our webSocket
 
-        if (webSocket?.isOpen)
-    }
-
-    override fun incomingMessageFlow(messageJson: String?): Flow<MessageModel> = flow {
-        if (messageJson.isNullOrBlank()) {
-            // emit nothing
-            // todo emit Resource.Error after implementing Resource util Sealed Class
-        } else {
-            try {
-                val messageDto = gson.fromJson(messageJson, MessageDto::class.java)
-                val message = messageDto.toMessageModel()
-                emit(message)
-            } catch (e: Exception) {
-                e.printStackTrace()
-                // emit nothing
-                // todo emit Resource.Error after implementing Resource util Sealed Class
-            }
+            Resource.Success(Unit) // todo uncomment this below
+//            if (webSocket?.isOpen == true) {
+//                Resource.Success(Unit) // cause nothing to return
+//            } else {
+//                Resource.Error("Couldn't establish a connection")
+//            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Resource.Error(e.localizedMessage ?: "Unknown error")
         }
     }
+
+    override fun incomingMessageFlow(): Flow<MessageModel> {
+        TODO("Not yet implemented")
+    }
+
+//    override fun incomingMessageFlow(messageJson: String?): Flow<MessageModel> = flow {
+//        if (messageJson.isNullOrBlank()) {
+//            // emit nothing
+//            // todo emit Resource.Error after implementing Resource util Sealed Class
+//        } else {
+//            try {
+//                val messageDto = gson.fromJson(messageJson, MessageDto::class.java)
+//                val message = messageDto.toMessageModel()
+//                emit(message)
+//            } catch (e: Exception) {
+//                e.printStackTrace()
+//                // emit nothing
+//                // todo emit Resource.Error after implementing Resource util Sealed Class
+//            }
+//        }
+//    }
 
     override fun sendMessageToSocket(message: MessageModel) {
         try {

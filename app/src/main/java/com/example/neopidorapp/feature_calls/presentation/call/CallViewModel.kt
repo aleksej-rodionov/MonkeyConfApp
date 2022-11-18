@@ -5,10 +5,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.neopidorapp.feature_calls.data.remote.SocketRepo
 import com.example.neopidorapp.feature_calls.domain.model.MessageModel
+import com.example.neopidorapp.shared.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -27,7 +26,19 @@ class CallViewModel @Inject constructor(
     fun initSocket() {
         val username = savedStateHandle.get<String>("username")
         username?.let {
-
+            viewModelScope.launch {
+                val result = socketRepo.initSocket(it)
+                when (result) {
+                    is Resource.Success -> {
+                        socketRepo.incomingMessageFlow().onEach {
+                            // todo what to do with message?
+                        }.launchIn(viewModelScope)
+                    }
+                    is Resource.Error -> {
+                        emitEvent(CallScreenEvent.SnackbarMessage(result.message?.toString() ?: "Undefined error occured"))
+                    }
+                }
+            }
         }
     }
 }
@@ -38,4 +49,5 @@ data class CallScreenState(
 
 sealed class CallScreenEvent() {
     data class SocketMessageReceived(val msg: MessageModel): CallScreenEvent()
+    data class SnackbarMessage(val msg: String): CallScreenEvent()
 }
