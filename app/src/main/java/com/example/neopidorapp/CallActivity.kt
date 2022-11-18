@@ -7,8 +7,8 @@ import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.neopidorapp.databinding.ActivityCallBinding
+import com.example.neopidorapp.feature_calls.domain.model.MessageModel
 import com.example.neopidorapp.models.IceCandidateModel
-import com.example.neopidorapp.models.MessageModel
 import com.example.neopidorapp.util.NewMessageInterface
 import com.example.neopidorapp.util.PeerConnectionObserver
 import com.example.neopidorapp.util.RTCAudioManager
