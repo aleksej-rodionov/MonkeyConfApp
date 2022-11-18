@@ -27,7 +27,7 @@ class SocketRepo(
         // (192.168.43.215 was of my phone)
         // (192.168.42.201 was of my phone)
         // (10.124.1.226 was of in coworking)
-        webSocket = object : WebSocketClient(URI("ws://10.124.1.226:3000")) {
+        webSocket = object : WebSocketClient(URI("ws://10.124.1.65:3000")) {
             override fun onOpen(handshakedata: ServerHandshake?) {
                 sendMessageToSocket(
                     MessageModel(

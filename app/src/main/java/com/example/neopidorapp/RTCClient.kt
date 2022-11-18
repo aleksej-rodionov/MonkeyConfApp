@@ -1,8 +1,11 @@
 package com.example.neopidorapp
 
 import android.app.Application
+import android.util.Log
 import com.example.neopidorapp.models.MessageModel
 import org.webrtc.*
+
+private const val TAG = "RTCClient"
 
 class RTCClient(
     private val application: Application,
@@ -58,6 +61,7 @@ class RTCClient(
 
     init {
         initPeerConnectionFactory(application)
+        Log.d(TAG, "peerConnection = $peerConnection")
     }
 
     private fun initPeerConnectionFactory(application: Application) {
