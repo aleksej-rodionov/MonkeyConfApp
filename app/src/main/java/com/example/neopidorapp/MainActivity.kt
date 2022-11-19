@@ -7,7 +7,9 @@ import android.os.Bundle
 import android.widget.Toast
 import com.example.neopidorapp.databinding.ActivityMainBinding
 import com.permissionx.guolindev.PermissionX
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
     private val binding by lazy { ActivityMainBinding.inflate(layoutInflater) }
