@@ -35,6 +35,25 @@ class CallFragment: Fragment(R.layout.fragment_call) {
             vm.callScreenState.collectLatest { state ->
 
                 binding.apply {
+
+                    if (state.incomingCallReceived) {
+                        setIncomingCallLayoutVisible()
+                        setWhoToCallLayoutGone()
+                    } else {
+                        setIncomingCallLayoutGone()
+                    }
+
+                    if (state.isCallRunning) {
+                        setCallLayoutVisible()
+                        setWhoToCallLayoutGone()
+                    } else {
+                        setCallLayoutGone()
+                    }
+
+                    if (!state.incomingCallReceived && !state.isCallRunning) {
+                        setWhoToCallLayoutVisible()
+                    }
+
                     micButton.setImageResource(if (state.isMute) R.drawable.ic_baseline_mic_24
                     else R.drawable.ic_baseline_mic_off_24)
 
@@ -90,6 +109,8 @@ class CallFragment: Fragment(R.layout.fragment_call) {
         _binding = null
     }
 
+
+
     private fun setIncomingCallLayoutGone() {
         binding.incomingCallLayout.visibility = View.GONE
     }
@@ -98,19 +119,19 @@ class CallFragment: Fragment(R.layout.fragment_call) {
         binding.incomingCallLayout.visibility = View.VISIBLE
     }
 
-    private fun setCallLayoutGone() {
-        binding.callLayout.visibility = View.GONE
-    }
-
-    private fun setCallLayoutVisible() {
-        binding.callLayout.visibility = View.VISIBLE
-    }
-
     private fun setWhoToCallLayoutGone() {
         binding.whoToCallLayout.visibility = View.GONE
     }
 
     private fun setWhoToCallLayoutVisible() {
         binding.whoToCallLayout.visibility = View.VISIBLE
+    }
+
+    private fun setCallLayoutGone() {
+        binding.callLayout.visibility = View.GONE
+    }
+
+    private fun setCallLayoutVisible() {
+        binding.callLayout.visibility = View.VISIBLE
     }
 }

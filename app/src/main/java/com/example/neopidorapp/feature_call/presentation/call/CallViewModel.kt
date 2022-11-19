@@ -31,6 +31,12 @@ class CallViewModel @Inject constructor(
     //=====================SCREEN STATE=========================
     private val _callScreenState = MutableStateFlow(CallScreenState())
     val callScreenState: StateFlow<CallScreenState> = _callScreenState.asStateFlow()
+    private fun updateIncomingCallReceived(received: Boolean) {
+        _callScreenState.value = callScreenState.value.copy(incomingCallReceived = received)
+    }
+    private fun updateIsCallRunning(callRunning: Boolean) {
+        _callScreenState.value = callScreenState.value.copy(isCallRunning = callRunning)
+    }
     private fun updateIsMute(mute: Boolean) {
         _callScreenState.value = callScreenState.value.copy(isMute = mute)
     }
@@ -72,7 +78,7 @@ class CallViewModel @Inject constructor(
         }else{
             updateIsMute(true)
         }
-        rtcClient?.toggleAudio(isMute)
+        rtcClient?.toggleAudio(/*isMute*/ callScreenState.value.isMute)
     }
 
     fun onVideoButtonClick() {
@@ -81,7 +87,7 @@ class CallViewModel @Inject constructor(
         } else {
             updateIsCameraPaused(true)
         }
-        rtcClient?.toggleCamera(isCameraPaused)
+        rtcClient?.toggleCamera(/*isCameraPaused*/ callScreenState.value.isCameraPaused)
     }
 
     fun onAudioOutputButtonClick() {
@@ -95,14 +101,17 @@ class CallViewModel @Inject constructor(
     }
 
     fun onEndCallButtonClick() {
-        setCallLayoutGone()
-        setWhoToCallLayoutVisible()
-        setIncomingCallLayoutGone()
+        updateIsCallRunning(false)
+//        setCallLayoutGone()
+//        setWhoToCallLayoutVisible()
+//        setIncomingCallLayoutGone()
         rtcClient?.endCall()
     }
 }
 
 data class CallScreenState(
+    val incomingCallReceived: Boolean = false,
+    val isCallRunning: Boolean = false,
     val isMute: Boolean = false,
     val isCameraPaused: Boolean = false,
     val isSpeakerMode: Boolean = false
