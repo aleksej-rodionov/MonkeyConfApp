@@ -10,6 +10,8 @@ import com.example.neopidorapp.models.MessageModel
 import com.example.neopidorapp.util.NewMessageInterface
 import com.example.neopidorapp.feature_call.presentation.call.rtc.PeerConnectionObserver
 import com.example.neopidorapp.feature_call.presentation.call.rtc.RTCAudioManager
+import com.example.neopidorapp.feature_call.presentation.call.rtc.RTCClient
+import com.example.neopidorapp.feature_call.presentation.call.socket.SocketRepo
 import com.google.gson.Gson
 import org.webrtc.IceCandidate
 import org.webrtc.MediaStream

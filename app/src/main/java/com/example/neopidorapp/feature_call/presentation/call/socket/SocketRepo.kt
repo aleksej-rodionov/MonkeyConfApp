@@ -4,6 +4,11 @@ import android.util.Log
 import com.example.neopidorapp.models.MessageModel
 import com.example.neopidorapp.util.NewMessageInterface
 import com.google.gson.Gson
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.launch
 import org.java_websocket.client.WebSocketClient
 import org.java_websocket.handshake.ServerHandshake
 import java.net.URI
@@ -12,8 +17,15 @@ import kotlin.Exception
 private const val TAG = "SocketRepo"
 
 class SocketRepo(
-    private val newMessageInterface: NewMessageInterface
+    private val scope: CoroutineScope
+//    private val newMessageInterface: NewMessageInterface
 ) {
+    private val _incomingMessage: MutableSharedFlow<MessageModel> = MutableSharedFlow()
+    val incomingMessage: SharedFlow<MessageModel> = _incomingMessage.asSharedFlow()
+    private fun emitNewMessage(message: MessageModel) = scope.launch {
+        _incomingMessage.emit(message)
+    }
+
     private var webSocket: WebSocketClient? = null
     private var userName: String? = null
     private val gson = Gson()
@@ -42,7 +54,9 @@ class SocketRepo(
             override fun onMessage(message: String?) {
                 try {
                     // todo emit some SharedFlow new value instead of triggering the interface method
-                    newMessageInterface.onNewMessage(gson.fromJson(message, MessageModel::class.java))
+//                    newMessageInterface.onNewMessage(gson.fromJson(message, MessageModel::class.java))
+                    val messageModel = gson.fromJson(message, MessageModel::class.java)
+                    emitNewMessage(messageModel)
                 } catch (e: Exception) {
                     e.printStackTrace()
                 }
