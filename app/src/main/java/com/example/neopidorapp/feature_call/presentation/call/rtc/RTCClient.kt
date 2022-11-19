@@ -1,7 +1,8 @@
-package com.example.neopidorapp
+package com.example.neopidorapp.feature_call.presentation.call.rtc
 
 import android.app.Application
 import android.util.Log
+import com.example.neopidorapp.feature_call.presentation.call.socket.SocketRepo
 import com.example.neopidorapp.models.MessageModel
 import org.webrtc.*
 

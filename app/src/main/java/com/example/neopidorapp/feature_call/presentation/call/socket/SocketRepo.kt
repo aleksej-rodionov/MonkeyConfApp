@@ -1,4 +1,4 @@
-package com.example.neopidorapp
+package com.example.neopidorapp.feature_call.presentation.call.socket
 
 import android.util.Log
 import com.example.neopidorapp.models.MessageModel
@@ -41,6 +41,7 @@ class SocketRepo(
 
             override fun onMessage(message: String?) {
                 try {
+                    // todo emit some SharedFlow new value instead of triggering the interface method
                     newMessageInterface.onNewMessage(gson.fromJson(message, MessageModel::class.java))
                 } catch (e: Exception) {
                     e.printStackTrace()

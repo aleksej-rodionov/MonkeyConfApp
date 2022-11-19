@@ -1,7 +1,6 @@
 package com.example.neopidorapp
 
 import android.os.Bundle
-import android.os.PersistableBundle
 import android.util.Log
 import android.view.View
 import android.widget.Toast
@@ -10,12 +9,11 @@ import com.example.neopidorapp.databinding.ActivityCallBinding
 import com.example.neopidorapp.models.IceCandidateModel
 import com.example.neopidorapp.models.MessageModel
 import com.example.neopidorapp.util.NewMessageInterface
-import com.example.neopidorapp.util.PeerConnectionObserver
-import com.example.neopidorapp.util.RTCAudioManager
+import com.example.neopidorapp.feature_call.presentation.call.rtc.PeerConnectionObserver
+import com.example.neopidorapp.feature_call.presentation.call.rtc.RTCAudioManager
 import com.google.gson.Gson
 import org.webrtc.IceCandidate
 import org.webrtc.MediaStream
-import org.webrtc.PeerConnection
 import org.webrtc.SessionDescription
 
 private const val TAG = "CallActivity"
