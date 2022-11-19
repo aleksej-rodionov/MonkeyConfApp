@@ -23,37 +23,9 @@ class MainActivity : AppCompatActivity() {
 
         val navHost = supportFragmentManager.findFragmentById(R.id.fragmentContainer) as NavHostFragment
         navController = navHost.navController
-
-//        binding.enterBtn.setOnClickListener {
-//
-//            PermissionX.init(this)
-//                .permissions(
-//                    Manifest.permission.RECORD_AUDIO,
-//                    Manifest.permission.CAMERA
-//                ).request { alLGranted, _, _ ->
-//                    if (alLGranted) {
-//                        startActivity(
-//                            Intent(
-//                                this@MainActivity,
-//                                CallActivity::class.java
-//                            ).putExtra("username", binding.username.text.toString())
-//                        )
-//                    } else {
-//                        Toast.makeText(
-//                            this,
-//                            "You shoulg accept all permissions",
-//                            Toast.LENGTH_LONG
-//                        ).show()
-//                    }
-//                }
-//        }
     }
 
     override fun onSupportNavigateUp(): Boolean {
         return navController.navigateUp() || super.onSupportNavigateUp()
     }
-
-
-
-
 }

@@ -15,5 +15,9 @@
     <fragment
         android:id="@+id/callFragment"
         android:name="com.example.neopidorapp.feature_call.presentation.call.CallFragment"
-        android:label="CallFragment" />
+        android:label="CallFragment" >
+        <argument
+            android:name="username"
+            app:argType="string" />
+    </fragment>
 </navigation>
