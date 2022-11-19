@@ -25,6 +25,7 @@ class CallViewModel @Inject constructor(
 
     private var username = savedStateHandle.get<String>("username")
     private var targetName: String? = null
+    fun updateTargetName(name: String) { targetName = name }
     private val incomingMessage = socketRepo.incomingMessage
 
     //=====================SCREEN STATE=========================
@@ -55,11 +56,10 @@ class CallViewModel @Inject constructor(
             MessageModel(
                 "start_call",
                 username,
-                targetUserNameEt.text.toString(),
+                targetName,
                 null
             )
         )
-        targetName = targetUserNameEt.text.toString()
     }
 
     fun onSwitchCameraButtonClick() {
@@ -69,10 +69,8 @@ class CallViewModel @Inject constructor(
     fun onMicButtonClick() {
         if (callScreenState.value.isMute){
             updateIsMute(false)
-            micButton.setImageResource(R.drawable.ic_baseline_mic_off_24)
         }else{
             updateIsMute(true)
-            micButton.setImageResource(R.drawable.ic_baseline_mic_24)
         }
         rtcClient?.toggleAudio(isMute)
     }
@@ -80,10 +78,8 @@ class CallViewModel @Inject constructor(
     fun onVideoButtonClick() {
         if (callScreenState.value.isCameraPaused) {
             updateIsCameraPaused(false)
-            videoButton.setImageResource(R.drawable.ic_baseline_videocam_off_24)
         } else {
             updateIsCameraPaused(true)
-            videoButton.setImageResource(R.drawable.ic_baseline_videocam_24)
         }
         rtcClient?.toggleCamera(isCameraPaused)
     }
@@ -91,11 +87,9 @@ class CallViewModel @Inject constructor(
     fun onAudioOutputButtonClick() {
         if (callScreenState.value.isSpeakerMode) {
             updateIsSpeakerMode(false)
-            audioOutputButton.setImageResource(R.drawable.ic_baseline_hearing_24)
             rtcAudioManager.setDefaultAudioDevice(RTCAudioManager.AudioDevice.EARPIECE)
         } else {
             updateIsSpeakerMode(true)
-            audioOutputButton.setImageResource(R.drawable.ic_baseline_speaker_up_24)
             rtcAudioManager.setDefaultAudioDevice(RTCAudioManager.AudioDevice.SPEAKER_PHONE)
         }
     }
