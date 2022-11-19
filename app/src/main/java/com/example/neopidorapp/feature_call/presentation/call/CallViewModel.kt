@@ -28,7 +28,7 @@ class CallViewModel @Inject constructor(
     fun updateTargetName(name: String) { targetName = name }
     private val incomingMessage = socketRepo.incomingMessage
 
-    //=====================SCREEN STATE=========================
+    //====================SCREEN STATE====================
     private val _callScreenState = MutableStateFlow(CallScreenState())
     val callScreenState: StateFlow<CallScreenState> = _callScreenState.asStateFlow()
     private fun updateIncomingCallReceived(received: Boolean) {
@@ -46,6 +46,7 @@ class CallViewModel @Inject constructor(
     private fun updateIsSpeakerMode(mute: Boolean) {
         _callScreenState.value = callScreenState.value.copy(isSpeakerMode = mute)
     }
+    //====================SCREEN STATE END====================
 
 
 
