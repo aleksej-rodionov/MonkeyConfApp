@@ -40,11 +40,11 @@ class CallActivity : AppCompatActivity(), NewMessageInterface {
     }
 
     private fun init() {
-        userName = intent.getStringExtra("username")
-        socketRepo = SocketRepo(this@CallActivity)
-        userName?.let {
-            socketRepo?.initSocket(it)
-        }
+//        userName = intent.getStringExtra("username")
+//        socketRepo = SocketRepo(this@CallActivity)
+//        userName?.let {
+//            socketRepo?.initSocket(it)
+//        }
         rtcClient = RTCClient(
             application, // we can just write "application" cause we're inside of the Activity
             userName!!,
@@ -134,6 +134,7 @@ class CallActivity : AppCompatActivity(), NewMessageInterface {
         }
     }
 
+    // todo place in UI incomingMessage.collectLatest {}
     override fun onNewMessage(message: MessageModel) {
         Log.d(TAG, "onNewMessage: $message")
         when (message.type) {
@@ -216,27 +217,27 @@ class CallActivity : AppCompatActivity(), NewMessageInterface {
         }
     }
 
-    private fun setIncomingCallLayoutGone() {
-        binding.incomingCallLayout.visibility = View.GONE
-    }
-
-    private fun setIncomingCallLayoutVisible() {
-        binding.incomingCallLayout.visibility = View.VISIBLE
-    }
-
-    private fun setCallLayoutGone() {
-        binding.callLayout.visibility = View.GONE
-    }
-
-    private fun setCallLayoutVisible() {
-        binding.callLayout.visibility = View.VISIBLE
-    }
-
-    private fun setWhoToCallLayoutGone() {
-        binding.whoToCallLayout.visibility = View.GONE
-    }
-
-    private fun setWhoToCallLayoutVisible() {
-        binding.whoToCallLayout.visibility = View.VISIBLE
-    }
+//    private fun setIncomingCallLayoutGone() {
+//        binding.incomingCallLayout.visibility = View.GONE
+//    }
+//
+//    private fun setIncomingCallLayoutVisible() {
+//        binding.incomingCallLayout.visibility = View.VISIBLE
+//    }
+//
+//    private fun setCallLayoutGone() {
+//        binding.callLayout.visibility = View.GONE
+//    }
+//
+//    private fun setCallLayoutVisible() {
+//        binding.callLayout.visibility = View.VISIBLE
+//    }
+//
+//    private fun setWhoToCallLayoutGone() {
+//        binding.whoToCallLayout.visibility = View.GONE
+//    }
+//
+//    private fun setWhoToCallLayoutVisible() {
+//        binding.whoToCallLayout.visibility = View.VISIBLE
+//    }
 }
