@@ -17,16 +17,16 @@ import org.webrtc.IceCandidate
 import org.webrtc.MediaStream
 import org.webrtc.SessionDescription
 
-private const val TAG = "CallActivity"
+//private const val TAG = "CallActivity"
 
-class CallActivity : AppCompatActivity(), NewMessageInterface {
+//class CallActivity : AppCompatActivity(), NewMessageInterface {
 
 //    private val binding by lazy { ActivityCallBinding.inflate(layoutInflater) }
 //    private var userName: String? = null
 //    private var socketRepo: SocketRepo? = null
 //    private var rtcClient: RTCClient? = null
 //    private var target: String = ""
-    private val gson = Gson()
+//    private val gson = Gson()
 //    private var isMute = false
 //    private var isCameraPaused = false
 //    private val rtcAudioManager by lazy { RTCAudioManager.create(this) } // todo look over this class
@@ -134,88 +134,88 @@ class CallActivity : AppCompatActivity(), NewMessageInterface {
 //        }
 //    }
 
-    // todo place in UI incomingMessage.collectLatest {}
-    override fun onNewMessage(message: MessageModel) {
-        Log.d(TAG, "onNewMessage: $message")
-        when (message.type) {
-            "call_response" -> {
-                if (message.data == "user is not online") {
-                    runOnUiThread { // we have to run it on the UI thread because we're on the Socket thread
-                        Toast.makeText(this, "user is not reachable", Toast.LENGTH_LONG).show()
-                    }
-                } else {
-                    runOnUiThread { // we have to run it on the UI thread because we're on the Socket thread
-                        setWhoToCallLayoutGone()
-                        setCallLayoutVisible()
-                        binding.apply {
-                            rtcClient?.initializeSurfaceView(localView)
-                            rtcClient?.initializeSurfaceView(remoteView)
-                            rtcClient?.startLocalVideo(localView)
-                            rtcClient?.call(targetUserNameEt.text.toString())
-                        }
-                    }
-                }
-            }
-            "offer_received" -> {
-                runOnUiThread {
-                    setIncomingCallLayoutVisible()
-                    binding.apply {
-                        incomingNameTV.text = "${message.name.toString()} is calling you"
-                        acceptButton.setOnClickListener {
-                            setIncomingCallLayoutGone()
-                            setCallLayoutVisible()
-                            setWhoToCallLayoutGone()
-
-                            rtcClient?.initializeSurfaceView(localView)
-                            rtcClient?.initializeSurfaceView(remoteView)
-                            rtcClient?.startLocalVideo(localView)
-                            val remoteSession = SessionDescription(
-                                SessionDescription.Type.OFFER,
-                                message.data.toString()
-                            )
-                            rtcClient?.onRemoteSessionReceived(remoteSession)
-                            rtcClient?.answer(message.name!!)
-                            target = message.name!!
-                        }
-                        rejectButton.setOnClickListener {
-                            setIncomingCallLayoutGone()
-                        }
-                        remoteViewLoading.visibility = View.GONE
-                    }
-                }
-            }
-            "answer_received" -> {
-                val session = SessionDescription(
-                    SessionDescription.Type.ANSWER,
-                    message.data.toString()
-                )
-                rtcClient?.onRemoteSessionReceived(session)
-                runOnUiThread {
-                    binding.remoteViewLoading.visibility = View.GONE
-                }
-            }
-            "ice_candidate" -> {
-                // RECEIVING ICE CANDIDATE:
-                runOnUiThread {
-                    try {
-                        val receivedIceCandidate = gson.fromJson(
-                            gson.toJson(message.data),
-                            IceCandidateModel::class.java
-                        )
-                        rtcClient?.addIceCandidate(
-                            IceCandidate(
-                                receivedIceCandidate.sdpMid,
-                                Math.toIntExact(receivedIceCandidate.sdpMLineIndex.toLong()),
-                                receivedIceCandidate.sdpCandidate
-                            )
-                        )
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                    }
-                }
-            }
-        }
-    }
+//    // todo place in UI incomingMessage.collectLatest {}
+//    override fun onNewMessage(message: MessageModel) {
+//        Log.d(TAG, "onNewMessage: $message")
+//        when (message.type) {
+//            "call_response" -> {
+//                if (message.data == "user is not online") {
+//                    runOnUiThread { // we have to run it on the UI thread because we're on the Socket thread
+//                        Toast.makeText(this, "user is not reachable", Toast.LENGTH_LONG).show()
+//                    }
+//                } else {
+//                    runOnUiThread { // we have to run it on the UI thread because we're on the Socket thread
+//                        setWhoToCallLayoutGone()
+//                        setCallLayoutVisible()
+//                        binding.apply {
+//                            rtcClient?.initializeSurfaceView(localView)
+//                            rtcClient?.initializeSurfaceView(remoteView)
+//                            rtcClient?.startLocalVideo(localView)
+//                            rtcClient?.call(targetUserNameEt.text.toString())
+//                        }
+//                    }
+//                }
+//            }
+//            "offer_received" -> {
+//                runOnUiThread {
+//                    setIncomingCallLayoutVisible()
+//                    binding.apply {
+//                        incomingNameTV.text = "${message.name.toString()} is calling you"
+//                        acceptButton.setOnClickListener {
+//                            setIncomingCallLayoutGone()
+//                            setCallLayoutVisible()
+//                            setWhoToCallLayoutGone()
+//
+//                            rtcClient?.initializeSurfaceView(localView)
+//                            rtcClient?.initializeSurfaceView(remoteView)
+//                            rtcClient?.startLocalVideo(localView)
+//                            val remoteSession = SessionDescription(
+//                                SessionDescription.Type.OFFER,
+//                                message.data.toString()
+//                            )
+//                            rtcClient?.onRemoteSessionReceived(remoteSession)
+//                            rtcClient?.answer(message.name!!)
+//                            target = message.name!!
+//                        }
+//                        rejectButton.setOnClickListener {
+//                            setIncomingCallLayoutGone()
+//                        }
+//                        remoteViewLoading.visibility = View.GONE
+//                    }
+//                }
+//            }
+//            "answer_received" -> {
+//                val session = SessionDescription(
+//                    SessionDescription.Type.ANSWER,
+//                    message.data.toString()
+//                )
+//                rtcClient?.onRemoteSessionReceived(session)
+//                runOnUiThread {
+//                    binding.remoteViewLoading.visibility = View.GONE
+//                }
+//            }
+//            "ice_candidate" -> {
+//                // RECEIVING ICE CANDIDATE:
+//                runOnUiThread {
+//                    try {
+//                        val receivedIceCandidate = gson.fromJson(
+//                            gson.toJson(message.data),
+//                            IceCandidateModel::class.java
+//                        )
+//                        rtcClient?.addIceCandidate(
+//                            IceCandidate(
+//                                receivedIceCandidate.sdpMid,
+//                                Math.toIntExact(receivedIceCandidate.sdpMLineIndex.toLong()),
+//                                receivedIceCandidate.sdpCandidate
+//                            )
+//                        )
+//                    } catch (e: Exception) {
+//                        e.printStackTrace()
+//                    }
+//                }
+//            }
+//        }
+//    }
 
 //    private fun setIncomingCallLayoutGone() {
 //        binding.incomingCallLayout.visibility = View.GONE
@@ -240,4 +240,4 @@ class CallActivity : AppCompatActivity(), NewMessageInterface {
 //    private fun setWhoToCallLayoutVisible() {
 //        binding.whoToCallLayout.visibility = View.VISIBLE
 //    }
-}
+//}

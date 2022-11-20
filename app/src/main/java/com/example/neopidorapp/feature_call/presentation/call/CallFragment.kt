@@ -2,6 +2,7 @@ package com.example.neopidorapp.feature_call.presentation.call
 
 import android.os.Bundle
 import android.view.View
+import android.widget.Toast
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -12,11 +13,14 @@ import com.example.neopidorapp.databinding.FragmentCallBinding
 import com.example.neopidorapp.feature_call.presentation.call.rtc.PeerConnectionObserver
 import com.example.neopidorapp.feature_call.presentation.call.rtc.RTCAudioManager
 import com.example.neopidorapp.feature_call.presentation.call.rtc.RTCClient
+import com.example.neopidorapp.models.IceCandidateModel
 import com.example.neopidorapp.models.MessageModel
+import com.google.gson.Gson
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import org.webrtc.IceCandidate
 import org.webrtc.MediaStream
+import org.webrtc.SessionDescription
 
 @AndroidEntryPoint
 class CallFragment: Fragment(R.layout.fragment_call) {
@@ -30,6 +34,8 @@ class CallFragment: Fragment(R.layout.fragment_call) {
     private val rtcAudioManager by lazy { RTCAudioManager.create(requireContext()) }
     // todo move to the Service?
     private var rtcClient: RTCClient? = null
+
+    private val gson = Gson()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -80,6 +86,89 @@ class CallFragment: Fragment(R.layout.fragment_call) {
                     // todo move to the Service?
                     rtcAudioManager.setDefaultAudioDevice(if (state.isSpeakerMode) RTCAudioManager.AudioDevice.SPEAKER_PHONE
                     else RTCAudioManager.AudioDevice.EARPIECE)
+                }
+            }
+        }
+
+        viewLifecycleOwner.lifecycleScope.launchWhenStarted {
+            vm.incomingMessage.collectLatest { message ->
+                when (message.type) {
+                    "call_response" -> {
+                        if (message.data == "user is not online") {
+//                            runOnUiThread { // we have to run it on the UI thread because we're on the Socket thread
+                                Toast.makeText(requireContext(), "user is not reachable", Toast.LENGTH_LONG).show()
+//                            }
+                        } else {
+//                            runOnUiThread { // we have to run it on the UI thread because we're on the Socket thread
+                                setWhoToCallLayoutGone()
+                                setCallLayoutVisible()
+                                binding.apply {
+                                    rtcClient?.initializeSurfaceView(localView)
+                                    rtcClient?.initializeSurfaceView(remoteView)
+                                    rtcClient?.startLocalVideo(localView)
+                                    rtcClient?.call(targetUserNameEt.text.toString())
+                                }
+//                            }
+                        }
+                    }
+                    "offer_received" -> {
+//                        runOnUiThread {
+                            setIncomingCallLayoutVisible()
+                            binding.apply {
+                                incomingNameTV.text = "${message.name.toString()} is calling you"
+                                acceptButton.setOnClickListener {
+                                    setIncomingCallLayoutGone()
+                                    setCallLayoutVisible()
+                                    setWhoToCallLayoutGone()
+
+                                    rtcClient?.initializeSurfaceView(localView)
+                                    rtcClient?.initializeSurfaceView(remoteView)
+                                    rtcClient?.startLocalVideo(localView)
+                                    val remoteSession = SessionDescription(
+                                        SessionDescription.Type.OFFER,
+                                        message.data.toString()
+                                    )
+                                    rtcClient?.onRemoteSessionReceived(remoteSession)
+                                    rtcClient?.answer(message.name!!)
+                                    vm.updateTargetName(message.name!!)
+                                }
+                                rejectButton.setOnClickListener {
+                                    setIncomingCallLayoutGone()
+                                }
+                                remoteViewLoading.visibility = View.GONE
+                            }
+//                        }
+                    }
+                    "answer_received" -> {
+                        val session = SessionDescription(
+                            SessionDescription.Type.ANSWER,
+                            message.data.toString()
+                        )
+                        rtcClient?.onRemoteSessionReceived(session)
+//                        runOnUiThread {
+                            binding.remoteViewLoading.visibility = View.GONE
+//                        }
+                    }
+                    "ice_candidate" -> {
+                        // RECEIVING ICE CANDIDATE:
+//                        runOnUiThread {
+                            try {
+                                val receivedIceCandidate = gson.fromJson(
+                                    gson.toJson(message.data),
+                                    IceCandidateModel::class.java
+                                )
+                                rtcClient?.addIceCandidate(
+                                    IceCandidate(
+                                        receivedIceCandidate.sdpMid,
+                                        Math.toIntExact(receivedIceCandidate.sdpMLineIndex.toLong()),
+                                        receivedIceCandidate.sdpCandidate
+                                    )
+                                )
+                            } catch (e: Exception) {
+                                e.printStackTrace()
+                            }
+//                        }
+                    }
                 }
             }
         }

@@ -32,7 +32,7 @@ class CallViewModel @Inject constructor(
     var targetName: String? = null
     fun updateTargetName(name: String) { targetName = name }
 
-    private val incomingMessage = socketRepo.incomingMessage
+    val incomingMessage = socketRepo.incomingMessage
 
     //====================SCREEN STATE====================
     private val _callScreenState = MutableStateFlow(CallScreenState())
