@@ -9,7 +9,7 @@ import org.webrtc.*
 private const val TAG = "RTCClient"
 
 class RTCClient(
-    private val application: Application,
+    private val application: Application?,
     private val username: String,
     private val socketRepo: SocketRepo,
 
@@ -61,7 +61,7 @@ class RTCClient(
     private var localVideoTrack: VideoTrack? = null
 
     init {
-        initPeerConnectionFactory(application)
+        initPeerConnectionFactory(application!!)
         Log.d(TAG, "peerConnection = $peerConnection")
     }
 
@@ -106,7 +106,7 @@ class RTCClient(
     fun startLocalVideo(surface: SurfaceViewRenderer) {
         val surfaceTextureHelper =
             SurfaceTextureHelper.create(Thread.currentThread().name, eglContext.eglBaseContext)
-        videoCapturer = getVideoCapturer(application)
+        videoCapturer = getVideoCapturer(application!!)
         videoCapturer?.initialize(
             surfaceTextureHelper,
             surface.context,

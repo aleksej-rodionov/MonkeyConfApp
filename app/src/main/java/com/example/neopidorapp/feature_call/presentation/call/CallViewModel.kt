@@ -4,6 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.neopidorapp.R
+import com.example.neopidorapp.feature_call.presentation.call.rtc.PeerConnectionObserver
 import com.example.neopidorapp.feature_call.presentation.call.rtc.RTCAudioManager
 import com.example.neopidorapp.feature_call.presentation.call.socket.SocketRepo
 import com.example.neopidorapp.models.MessageModel
@@ -14,6 +15,9 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import org.webrtc.IceCandidate
+import org.webrtc.MediaStream
+import org.webrtc.PeerConnection
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -23,9 +27,11 @@ class CallViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle
 ): ViewModel() {
 
-    private var username = savedStateHandle.get<String>("username")
-    private var targetName: String? = null
+    var username = savedStateHandle.get<String>("username")
+
+    var targetName: String? = null
     fun updateTargetName(name: String) { targetName = name }
+
     private val incomingMessage = socketRepo.incomingMessage
 
     //====================SCREEN STATE====================
@@ -70,7 +76,7 @@ class CallViewModel @Inject constructor(
     }
 
     fun onSwitchCameraButtonClick() {
-        rtcClient?.switchCamera()
+//        rtcClient?.switchCamera()
     }
 
     fun onMicButtonClick() {
@@ -79,7 +85,7 @@ class CallViewModel @Inject constructor(
         }else{
             updateIsMute(true)
         }
-        rtcClient?.toggleAudio(/*isMute*/ callScreenState.value.isMute)
+//        rtcClient?.toggleAudio(/*isMute*/ callScreenState.value.isMute)
     }
 
     fun onVideoButtonClick() {
@@ -88,16 +94,16 @@ class CallViewModel @Inject constructor(
         } else {
             updateIsCameraPaused(true)
         }
-        rtcClient?.toggleCamera(/*isCameraPaused*/ callScreenState.value.isCameraPaused)
+//        rtcClient?.toggleCamera(/*isCameraPaused*/ callScreenState.value.isCameraPaused)
     }
 
     fun onAudioOutputButtonClick() {
         if (callScreenState.value.isSpeakerMode) {
             updateIsSpeakerMode(false)
-            rtcAudioManager.setDefaultAudioDevice(RTCAudioManager.AudioDevice.EARPIECE)
+//            rtcAudioManager.setDefaultAudioDevice(RTCAudioManager.AudioDevice.EARPIECE)
         } else {
             updateIsSpeakerMode(true)
-            rtcAudioManager.setDefaultAudioDevice(RTCAudioManager.AudioDevice.SPEAKER_PHONE)
+//            rtcAudioManager.setDefaultAudioDevice(RTCAudioManager.AudioDevice.SPEAKER_PHONE)
         }
     }
 
@@ -106,7 +112,7 @@ class CallViewModel @Inject constructor(
 //        setCallLayoutGone()
 //        setWhoToCallLayoutVisible()
 //        setIncomingCallLayoutGone()
-        rtcClient?.endCall()
+//        rtcClient?.endCall()
     }
 }
 

@@ -21,118 +21,118 @@ private const val TAG = "CallActivity"
 
 class CallActivity : AppCompatActivity(), NewMessageInterface {
 
-    private val binding by lazy { ActivityCallBinding.inflate(layoutInflater) }
-    private var userName: String? = null
-    private var socketRepo: SocketRepo? = null
-    private var rtcClient: RTCClient? = null
-    private var target: String = ""
+//    private val binding by lazy { ActivityCallBinding.inflate(layoutInflater) }
+//    private var userName: String? = null
+//    private var socketRepo: SocketRepo? = null
+//    private var rtcClient: RTCClient? = null
+//    private var target: String = ""
     private val gson = Gson()
-    private var isMute = false
-    private var isCameraPaused = false
-    private val rtcAudioManager by lazy { RTCAudioManager.create(this) } // todo look over this class
-    private var isSpeakerMode = true
+//    private var isMute = false
+//    private var isCameraPaused = false
+//    private val rtcAudioManager by lazy { RTCAudioManager.create(this) } // todo look over this class
+//    private var isSpeakerMode = true
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(binding.root)
+//    override fun onCreate(savedInstanceState: Bundle?) {
+//        super.onCreate(savedInstanceState)
+//        setContentView(binding.root)
+//
+//        init()
+//    }
 
-        init()
-    }
-
-    private fun init() {
+//    private fun init() {
 //        userName = intent.getStringExtra("username")
 //        socketRepo = SocketRepo(this@CallActivity)
 //        userName?.let {
 //            socketRepo?.initSocket(it)
 //        }
-        rtcClient = RTCClient(
-            application, // we can just write "application" cause we're inside of the Activity
-            userName!!,
-            socketRepo!!,
-            object : PeerConnectionObserver() {
-                override fun onIceCandidate(p0: IceCandidate?) {
-                    super.onIceCandidate(p0)
-                    rtcClient?.addIceCandidate(p0) // we add an ICE Candidate...
-                    // ... and it's time to send this ICE Candidate to our peer:
-                    // SENDING ICE CANDIDATE:
-                    val candidate = hashMapOf(
-                        "sdpMid" to p0?.sdpMid,
-                        "sdpMLineIndex" to p0?.sdpMLineIndex,
-                        "sdpCandidate" to p0?.sdp
-                    )
-                    socketRepo?.sendMessageToSocket(
-                        MessageModel("ice_candidate", userName, target, candidate)
-                    )
-                }
+//        rtcClient = RTCClient(
+//            application, // we can just write "application" cause we're inside of the Activity
+//            userName!!,
+//            socketRepo!!,
+//            object : PeerConnectionObserver() {
+//                override fun onIceCandidate(p0: IceCandidate?) {
+//                    super.onIceCandidate(p0)
+//                    rtcClient?.addIceCandidate(p0) // we add an ICE Candidate...
+//                    // ... and it's time to send this ICE Candidate to our peer:
+//                    // SENDING ICE CANDIDATE:
+//                    val candidate = hashMapOf(
+//                        "sdpMid" to p0?.sdpMid,
+//                        "sdpMLineIndex" to p0?.sdpMLineIndex,
+//                        "sdpCandidate" to p0?.sdp
+//                    )
+//                    socketRepo?.sendMessageToSocket(
+//                        MessageModel("ice_candidate", userName, target, candidate)
+//                    )
+//                }
+//
+//                override fun onAddStream(p0: MediaStream?) {
+//                    super.onAddStream(p0)
+//                    p0?.videoTracks?.get(0)?.addSink(binding.remoteView)
+//                }
+//            }
+//        )
+//
+//        rtcAudioManager.setDefaultAudioDevice(RTCAudioManager.AudioDevice.SPEAKER_PHONE)
+//
+//        binding.apply {
+//            callBtn.setOnClickListener {
+//                socketRepo?.sendMessageToSocket(
+//                    MessageModel(
+//                        "start_call",
+//                        userName,
+//                        targetUserNameEt.text.toString(),
+//                        null
+//                    )
+//                )
+//                target = targetUserNameEt.text.toString()
+//            }
 
-                override fun onAddStream(p0: MediaStream?) {
-                    super.onAddStream(p0)
-                    p0?.videoTracks?.get(0)?.addSink(binding.remoteView)
-                }
-            }
-        )
-
-        rtcAudioManager.setDefaultAudioDevice(RTCAudioManager.AudioDevice.SPEAKER_PHONE)
-
-        binding.apply {
-            callBtn.setOnClickListener {
-                socketRepo?.sendMessageToSocket(
-                    MessageModel(
-                        "start_call",
-                        userName,
-                        targetUserNameEt.text.toString(),
-                        null
-                    )
-                )
-                target = targetUserNameEt.text.toString()
-            }
-
-            switchCameraButton.setOnClickListener {
-                rtcClient?.switchCamera()
-            }
-
-            micButton.setOnClickListener {
-                if (isMute){
-                    isMute = false
-                    micButton.setImageResource(R.drawable.ic_baseline_mic_off_24)
-                }else{
-                    isMute = true
-                    micButton.setImageResource(R.drawable.ic_baseline_mic_24)
-                }
-                rtcClient?.toggleAudio(isMute)
-            }
-
-            videoButton.setOnClickListener {
-                if (isCameraPaused) {
-                    isCameraPaused = false
-                    videoButton.setImageResource(R.drawable.ic_baseline_videocam_off_24)
-                } else {
-                    isCameraPaused = true
-                    videoButton.setImageResource(R.drawable.ic_baseline_videocam_24)
-                }
-                rtcClient?.toggleCamera(isCameraPaused)
-            }
-
-            audioOutputButton.setOnClickListener {
-                if (isSpeakerMode) {
-                    isSpeakerMode = false
-                    audioOutputButton.setImageResource(R.drawable.ic_baseline_hearing_24)
-                    rtcAudioManager.setDefaultAudioDevice(RTCAudioManager.AudioDevice.EARPIECE)
-                } else {
-                    isSpeakerMode = true
-                    audioOutputButton.setImageResource(R.drawable.ic_baseline_speaker_up_24)
-                    rtcAudioManager.setDefaultAudioDevice(RTCAudioManager.AudioDevice.SPEAKER_PHONE)
-                }
-            }
-
-            endCallButton.setOnClickListener {
-                setCallLayoutGone()
-                setWhoToCallLayoutVisible()
-                setIncomingCallLayoutGone()
-                rtcClient?.endCall()
-            }
-        }
-    }
+//            switchCameraButton.setOnClickListener {
+//                rtcClient?.switchCamera()
+//            }
+//
+//            micButton.setOnClickListener {
+//                if (isMute){
+//                    isMute = false
+//                    micButton.setImageResource(R.drawable.ic_baseline_mic_off_24)
+//                }else{
+//                    isMute = true
+//                    micButton.setImageResource(R.drawable.ic_baseline_mic_24)
+//                }
+//                rtcClient?.toggleAudio(isMute)
+//            }
+//
+//            videoButton.setOnClickListener {
+//                if (isCameraPaused) {
+//                    isCameraPaused = false
+//                    videoButton.setImageResource(R.drawable.ic_baseline_videocam_off_24)
+//                } else {
+//                    isCameraPaused = true
+//                    videoButton.setImageResource(R.drawable.ic_baseline_videocam_24)
+//                }
+//                rtcClient?.toggleCamera(isCameraPaused)
+//            }
+//
+//            audioOutputButton.setOnClickListener {
+//                if (isSpeakerMode) {
+//                    isSpeakerMode = false
+//                    audioOutputButton.setImageResource(R.drawable.ic_baseline_hearing_24)
+//                    rtcAudioManager.setDefaultAudioDevice(RTCAudioManager.AudioDevice.EARPIECE)
+//                } else {
+//                    isSpeakerMode = true
+//                    audioOutputButton.setImageResource(R.drawable.ic_baseline_speaker_up_24)
+//                    rtcAudioManager.setDefaultAudioDevice(RTCAudioManager.AudioDevice.SPEAKER_PHONE)
+//                }
+//            }
+//
+//            endCallButton.setOnClickListener {
+//                setCallLayoutGone()
+//                setWhoToCallLayoutVisible()
+//                setIncomingCallLayoutGone()
+//                rtcClient?.endCall()
+//            }
+//        }
+//    }
 
     // todo place in UI incomingMessage.collectLatest {}
     override fun onNewMessage(message: MessageModel) {
