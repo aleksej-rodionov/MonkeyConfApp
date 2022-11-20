@@ -57,38 +57,38 @@ class CallFragment: Fragment(R.layout.fragment_call) {
 
                 binding.apply {
 
-                    if (state.incomingCallReceived) {
-                        setIncomingCallLayoutVisible()
-                        setWhoToCallLayoutGone()
-                    } else {
-                        setIncomingCallLayoutGone()
-                    }
-
-                    if (state.isCallRunning) {
-                        setCallLayoutVisible()
-                        setWhoToCallLayoutGone()
-                    } else {
-                        setCallLayoutGone()
-                    }
-
-                    if (!state.incomingCallReceived && !state.isCallRunning) {
-                        setWhoToCallLayoutVisible()
-                    }
+//                    if (state.incomingCallReceived) {
+//                        setIncomingCallLayoutVisible()
+//                        setWhoToCallLayoutGone()
+//                    } else {
+//                        setIncomingCallLayoutGone()
+//                    }
+//
+//                    if (state.isCallRunning) {
+//                        setCallLayoutVisible()
+//                        setWhoToCallLayoutGone()
+//                    } else {
+//                        setCallLayoutGone()
+//                    }
+//
+//                    if (!state.incomingCallReceived && !state.isCallRunning) {
+//                        setWhoToCallLayoutVisible()
+//                    }
 
                     micButton.setImageResource(if (state.isMute) R.drawable.ic_baseline_mic_24
                     else R.drawable.ic_baseline_mic_off_24)
-                    rtcClient?.toggleAudio(state.isMute)
+//                    rtcClient?.toggleAudio(state.isMute)
 
                     videoButton.setImageResource(if (state.isCameraPaused) R.drawable.ic_baseline_videocam_off_24
                     else R.drawable.ic_baseline_videocam_24)
-                    rtcClient?.toggleCamera(state.isCameraPaused)
+//                    rtcClient?.toggleCamera(state.isCameraPaused)
 
                     audioOutputButton.setImageResource(if (state.isSpeakerMode) R.drawable.ic_baseline_cameraswitch_24
                     else R.drawable.ic_baseline_hearing_24)
 
                     // todo move to the Service?
-                    rtcAudioManager.setDefaultAudioDevice(if (state.isSpeakerMode) RTCAudioManager.AudioDevice.SPEAKER_PHONE
-                    else RTCAudioManager.AudioDevice.EARPIECE)
+//                    rtcAudioManager.setDefaultAudioDevice(if (state.isSpeakerMode) RTCAudioManager.AudioDevice.SPEAKER_PHONE
+//                    else RTCAudioManager.AudioDevice.EARPIECE)
                 }
             }
         }
@@ -198,20 +198,27 @@ class CallFragment: Fragment(R.layout.fragment_call) {
             }
 
             micButton.setOnClickListener {
+                rtcClient?.toggleAudio(!vm.callScreenState.value.isMute) // todo return to state collector?
                 vm.onMicButtonClick()
             }
 
             videoButton.setOnClickListener {
+                rtcClient?.toggleCamera(!vm.callScreenState.value.isCameraPaused) // todo return to state collector?
                 vm.onVideoButtonClick()
             }
 
             audioOutputButton.setOnClickListener {
+                rtcAudioManager.setDefaultAudioDevice(if (!vm.callScreenState.value.isSpeakerMode) RTCAudioManager.AudioDevice.SPEAKER_PHONE // todo return to state collector?
+                else RTCAudioManager.AudioDevice.EARPIECE) // todo return to state collector?
                 vm.onAudioOutputButtonClick()
             }
 
             endCallButton.setOnClickListener { // doesnt't kill CallFragment. Other listeners
                 // (that call rtcClient in state.collect {} block) - kill it
-                vm.onEndCallButtonClick()
+//                vm.onEndCallButtonClick()
+                setCallLayoutGone() // todo return to state collector?
+                setWhoToCallLayoutVisible() // todo return to state collector?
+                setIncomingCallLayoutGone() // todo return to state collector?
                 rtcClient?.endCall()
             }
         }
