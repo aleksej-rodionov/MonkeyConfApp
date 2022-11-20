@@ -1,6 +1,7 @@
 package com.example.neopidorapp.feature_call.presentation.call
 
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.core.widget.addTextChangedListener
@@ -21,6 +22,8 @@ import kotlinx.coroutines.flow.collectLatest
 import org.webrtc.IceCandidate
 import org.webrtc.MediaStream
 import org.webrtc.SessionDescription
+
+private const val TAG = "CallFragment"
 
 @AndroidEntryPoint
 class CallFragment: Fragment(R.layout.fragment_call) {
@@ -80,7 +83,7 @@ class CallFragment: Fragment(R.layout.fragment_call) {
                     else R.drawable.ic_baseline_videocam_24)
                     rtcClient?.toggleCamera(state.isCameraPaused)
 
-                    audioOutputButton.setImageResource(if (state.isSpeakerMode) R.drawable.ic_baseline_speaker_up_24
+                    audioOutputButton.setImageResource(if (state.isSpeakerMode) R.drawable.ic_baseline_cameraswitch_24
                     else R.drawable.ic_baseline_hearing_24)
 
                     // todo move to the Service?
@@ -92,6 +95,7 @@ class CallFragment: Fragment(R.layout.fragment_call) {
 
         viewLifecycleOwner.lifecycleScope.launchWhenStarted {
             vm.incomingMessage.collectLatest { message ->
+                Log.d(TAG, "onNewMessage: $message")
                 when (message.type) {
                     "call_response" -> {
                         if (message.data == "user is not online") {
@@ -187,7 +191,8 @@ class CallFragment: Fragment(R.layout.fragment_call) {
                 vm.onCallButtonClick()
             }
 
-            switchCameraButton.setOnClickListener {
+            switchCameraButton.setOnClickListener { // doesnt't kill CallFragment. Other listeners
+                // (that call rtcClient in state.collect {} block) - kill it
                 vm.onSwitchCameraButtonClick()
                 rtcClient?.switchCamera()
             }
@@ -204,7 +209,8 @@ class CallFragment: Fragment(R.layout.fragment_call) {
                 vm.onAudioOutputButtonClick()
             }
 
-            endCallButton.setOnClickListener {
+            endCallButton.setOnClickListener { // doesnt't kill CallFragment. Other listeners
+                // (that call rtcClient in state.collect {} block) - kill it
                 vm.onEndCallButtonClick()
                 rtcClient?.endCall()
             }

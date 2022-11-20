@@ -10,12 +10,13 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import com.example.neopidorapp.CallActivity
 import com.example.neopidorapp.R
 import com.example.neopidorapp.databinding.FragmentNameBinding
 import com.permissionx.guolindev.PermissionX
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 
+@AndroidEntryPoint
 class NameFragment: Fragment(R.layout.fragment_name) {
 
     private val vm: NameViewModel by viewModels()

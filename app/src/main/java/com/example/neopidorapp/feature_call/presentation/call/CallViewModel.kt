@@ -65,7 +65,7 @@ class CallViewModel @Inject constructor(
 
     //===================LISTENER METHODS======================
     fun onCallButtonClick() {
-        socketRepo?.sendMessageToSocket(
+        socketRepo.sendMessageToSocket(
             MessageModel(
                 "start_call",
                 username,
