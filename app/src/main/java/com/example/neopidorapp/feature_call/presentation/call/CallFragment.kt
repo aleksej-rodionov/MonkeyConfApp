@@ -117,7 +117,7 @@ class CallFragment: Fragment(R.layout.fragment_call) {
                     }
                     "offer_received" -> {
 //                        runOnUiThread {
-                            setIncomingCallLayoutVisible()
+                            setIncomingCallLayoutVisible() // todo it works, but collector not.
                             binding.apply {
                                 incomingNameTV.text = "${message.name.toString()} is calling you"
                                 acceptButton.setOnClickListener {

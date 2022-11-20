@@ -23,6 +23,7 @@ class SocketRepo(
     private val _incomingMessage: MutableSharedFlow<MessageModel> = MutableSharedFlow()
     val incomingMessage: SharedFlow<MessageModel> = _incomingMessage.asSharedFlow()
     private fun emitNewMessage(message: MessageModel) = scope.launch {
+        Log.d(TAG, "emitNewMessage: $message")
         _incomingMessage.emit(message)
     }
 
@@ -54,11 +55,13 @@ class SocketRepo(
 
             override fun onMessage(message: String?) {
                 try {
+                    Log.d(TAG, "onMessage: $message")
                     // todo emit some SharedFlow new value instead of triggering the interface method
 //                    newMessageInterface.onNewMessage(gson.fromJson(message, MessageModel::class.java))
                     val messageModel = gson.fromJson(message, MessageModel::class.java)
                     emitNewMessage(messageModel)
                 } catch (e: Exception) {
+                    Log.d(TAG, "onMessage: ${e.localizedMessage}")
                     e.printStackTrace()
                 }
             }
