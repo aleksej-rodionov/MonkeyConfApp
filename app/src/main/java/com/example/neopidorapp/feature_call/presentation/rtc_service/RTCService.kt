@@ -4,13 +4,16 @@ import android.app.Service
 import android.content.Intent
 import android.os.Binder
 import android.os.IBinder
+import com.example.neopidorapp.feature_call.presentation.rtc_service.notification.NotificationCallback
+import com.example.neopidorapp.feature_call.presentation.rtc_service.notification.RTCNotification
+import com.example.neopidorapp.feature_call.presentation.rtc_service.rtc_ui_state.RTCState
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 
 @AndroidEntryPoint
-class RTCService : Service() {
+class RTCService : Service(), NotificationCallback {
 
     private val rtcBinder = RTCBinder()
 
@@ -18,7 +21,17 @@ class RTCService : Service() {
     private val rtcServiceJob = SupervisorJob()
     private val rtcServiceScope = CoroutineScope(Dispatchers.Main + rtcServiceJob)
 
-    // todo RTCClient and its Notification stuff to be declared here
+
+
+    //====================RTCCLIENT AND ITS NOTIFICATION====================
+    val rtcState = RTCState()
+
+    // todo RTCClient with new parameters: state, notifCallback, coroutineScope
+
+    val notification = RTCNotification(rtcServiceScope, this)
+    //====================RTCCLIENT AND ITS NOTIFICATION END====================
+
+
 
     //====================OVERRIDDEN SERVICE METHODS====================
     override fun onBind(p0: Intent?): IBinder? {
@@ -50,5 +63,9 @@ class RTCService : Service() {
 
     inner class RTCBinder : Binder() {
         val service get() = this@RTCService
+    }
+
+    override fun launchNotification() {
+        notification.launchNotificationJob()
     }
 }
