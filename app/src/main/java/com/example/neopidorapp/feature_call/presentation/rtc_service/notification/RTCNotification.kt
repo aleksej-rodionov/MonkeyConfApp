@@ -10,6 +10,8 @@ import com.example.neopidorapp.feature_call.presentation.rtc_service.RTCService
 import com.example.neopidorapp.feature_call.presentation.rtc_service.rtc_ui_state.RTCUiState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 class RTCNotification(
     private val scope: CoroutineScope,
@@ -19,7 +21,16 @@ class RTCNotification(
     private var rtcNotificationJob: Job? = null
 
     override fun launchNotificationJob() {
-        // todo
+        rtcNotificationJob = scope.launch {
+            rtcService.rtcState.state.collectLatest { state ->
+                if (state.isOngoingCall) {
+                    showRtcNotification(state)
+                } else {
+                    stopNotificationJob()
+                    rtcService.stopForeground(true)
+                }
+            }
+        }
     }
 
     override fun stopNotificationJob() {
