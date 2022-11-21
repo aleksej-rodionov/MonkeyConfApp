@@ -19,7 +19,7 @@ class RTCNotification(
     private var rtcNotificationJob: Job? = null
 
     override fun launchNotificationJob() {
-        TODO("Not yet implemented")
+        // todo
     }
 
     override fun stopNotificationJob() {
