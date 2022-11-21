@@ -57,23 +57,25 @@ class CallFragment: Fragment(R.layout.fragment_call) {
 
                 binding.apply {
 
-//                    if (state.incomingCallReceived) {
-//                        setIncomingCallLayoutVisible()
-//                        setWhoToCallLayoutGone()
-//                    } else {
-//                        setIncomingCallLayoutGone()
-//                    }
-//
-//                    if (state.isCallRunning) {
-//                        setCallLayoutVisible()
-//                        setWhoToCallLayoutGone()
-//                    } else {
-//                        setCallLayoutGone()
-//                    }
-//
-//                    if (!state.incomingCallReceived && !state.isCallRunning) {
-//                        setWhoToCallLayoutVisible()
-//                    }
+                    //====================LAYOUT CONFIG====================
+                    if (state.isIncomingCall && !state.isOngoingCall) {
+                        setIncomingCallLayoutVisible()
+                        setCallLayoutGone()
+                        setWhoToCallLayoutGone()
+                    } else if (!state.isIncomingCall && state.isOngoingCall) {
+                        setIncomingCallLayoutGone()
+                        setCallLayoutVisible()
+                        setWhoToCallLayoutGone()
+                    } else if (state.isIncomingCall && state.isOngoingCall) {
+                        setIncomingCallLayoutVisible()
+                        setCallLayoutVisible()
+                        setWhoToCallLayoutGone()
+                    } else if (!state.isIncomingCall && !state.isOngoingCall) {
+                        setIncomingCallLayoutGone()
+                        setCallLayoutGone()
+                        setWhoToCallLayoutVisible()
+                    }
+                    //====================LAYOUT CONFIG END====================
 
                     micButton.setImageResource(if (state.isMute) R.drawable.ic_baseline_mic_24
                     else R.drawable.ic_baseline_mic_off_24)
@@ -100,12 +102,17 @@ class CallFragment: Fragment(R.layout.fragment_call) {
                     "call_response" -> {
                         if (message.data == "user is not online") {
 //                            runOnUiThread { // we have to run it on the UI thread because we're on the Socket thread
-                                Toast.makeText(requireContext(), "user is not reachable", Toast.LENGTH_LONG).show()
+                                Toast.makeText(requireContext(), "user is not online", Toast.LENGTH_LONG).show()
 //                            }
                         } else {
 //                            runOnUiThread { // we have to run it on the UI thread because we're on the Socket thread
-                                setWhoToCallLayoutGone()
-                                setCallLayoutVisible()
+
+                            //====================LAYOUT CONFIG====================
+//                                setWhoToCallLayoutGone() // todo handle through state
+//                                setCallLayoutVisible() // todo handle through state
+                                vm.updateIsOngoingCall(true)
+                            //====================LAYOUT CONFIG END====================
+
                                 binding.apply {
                                     rtcClient?.initializeSurfaceView(localView)
                                     rtcClient?.initializeSurfaceView(remoteView)
@@ -117,13 +124,23 @@ class CallFragment: Fragment(R.layout.fragment_call) {
                     }
                     "offer_received" -> {
 //                        runOnUiThread {
-                            setIncomingCallLayoutVisible() // todo it works, but collector not.
+
+                        //====================LAYOUT CONFIG====================
+//                            setIncomingCallLayoutVisible() // todo handle through state
+                            vm.updateIsIncomingCall(true)
+                        //====================LAYOUT CONFIG END====================
+
                             binding.apply {
                                 incomingNameTV.text = "${message.name.toString()} is calling you"
                                 acceptButton.setOnClickListener {
-                                    setIncomingCallLayoutGone()
-                                    setCallLayoutVisible()
-                                    setWhoToCallLayoutGone()
+
+                                    //====================LAYOUT CONFIG====================
+                                    setIncomingCallLayoutGone() // todo handle through state
+                                    setCallLayoutVisible() // todo handle through state
+                                    setWhoToCallLayoutGone() // todo handle through state
+                                    vm.updateIsIncomingCall(false)
+                                    vm.updateIsOngoingCall(true)
+                                    //====================LAYOUT CONFIG END====================
 
                                     rtcClient?.initializeSurfaceView(localView)
                                     rtcClient?.initializeSurfaceView(remoteView)
@@ -137,7 +154,12 @@ class CallFragment: Fragment(R.layout.fragment_call) {
                                     vm.updateTargetName(message.name!!)
                                 }
                                 rejectButton.setOnClickListener {
-                                    setIncomingCallLayoutGone()
+
+                                    //====================LAYOUT CONFIG====================
+                                    setIncomingCallLayoutGone() // todo handle through state
+                                    vm.updateIsIncomingCall(false)
+                                    //====================LAYOUT CONFIG END====================
+
                                 }
                                 remoteViewLoading.visibility = View.GONE
                             }
@@ -215,11 +237,14 @@ class CallFragment: Fragment(R.layout.fragment_call) {
 
             endCallButton.setOnClickListener { // doesnt't kill CallFragment. Other listeners
                 // (that call rtcClient in state.collect {} block) - kill it
-//                vm.onEndCallButtonClick()
-                setCallLayoutGone() // todo return to state collector?
-                setWhoToCallLayoutVisible() // todo return to state collector?
-                setIncomingCallLayoutGone() // todo return to state collector?
+                vm.onEndCallButtonClick()
                 rtcClient?.endCall()
+
+                //====================LAYOUT CONFIG====================
+//                setCallLayoutGone() // todo return to state collector?
+//                setWhoToCallLayoutVisible() // todo return to state collector?
+//                setIncomingCallLayoutGone() // todo return to state collector?
+                //====================LAYOUT CONFIG END====================
             }
         }
     }

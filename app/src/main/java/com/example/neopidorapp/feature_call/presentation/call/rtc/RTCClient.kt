@@ -232,11 +232,11 @@ class RTCClient(
     }
 
     fun toggleAudio(mute: Boolean) {
-        localAudioTrack?.setEnabled(mute)
+        localAudioTrack?.setEnabled(!mute)
     }
 
     fun toggleCamera(cameraPaused: Boolean) {
-        localVideoTrack?.setEnabled(cameraPaused)
+        localVideoTrack?.setEnabled(!cameraPaused)
     }
 
     fun endCall() {

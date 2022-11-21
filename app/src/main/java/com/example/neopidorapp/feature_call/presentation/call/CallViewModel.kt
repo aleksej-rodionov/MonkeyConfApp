@@ -2,24 +2,13 @@ package com.example.neopidorapp.feature_call.presentation.call
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import com.example.neopidorapp.R
-import com.example.neopidorapp.feature_call.presentation.call.rtc.PeerConnectionObserver
-import com.example.neopidorapp.feature_call.presentation.call.rtc.RTCAudioManager
 import com.example.neopidorapp.feature_call.presentation.call.socket.SocketRepo
 import com.example.neopidorapp.models.MessageModel
-import dagger.Provides
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.launch
-import org.webrtc.IceCandidate
-import org.webrtc.MediaStream
-import org.webrtc.PeerConnection
 import javax.inject.Inject
-import javax.inject.Singleton
 
 @HiltViewModel
 class CallViewModel @Inject constructor(
@@ -37,19 +26,19 @@ class CallViewModel @Inject constructor(
     //====================SCREEN STATE====================
     private val _callScreenState = MutableStateFlow(CallScreenState())
     val callScreenState: StateFlow<CallScreenState> = _callScreenState.asStateFlow()
-    private fun updateIncomingCallReceived(received: Boolean) {
-        _callScreenState.value = callScreenState.value.copy(incomingCallReceived = received)
+    fun updateIsIncomingCall(received: Boolean) {
+        _callScreenState.value = callScreenState.value.copy(isIncomingCall = received)
     }
-    private fun updateIsCallRunning(callRunning: Boolean) {
-        _callScreenState.value = callScreenState.value.copy(isCallRunning = callRunning)
+    fun updateIsOngoingCall(callRunning: Boolean) {
+        _callScreenState.value = callScreenState.value.copy(isOngoingCall = callRunning)
     }
-    private fun updateIsMute(mute: Boolean) {
+    fun updateIsMute(mute: Boolean) {
         _callScreenState.value = callScreenState.value.copy(isMute = mute)
     }
-    private fun updateIsCameraPaused(mute: Boolean) {
+    fun updateIsCameraPaused(mute: Boolean) {
         _callScreenState.value = callScreenState.value.copy(isCameraPaused = mute)
     }
-    private fun updateIsSpeakerMode(mute: Boolean) {
+    fun updateIsSpeakerMode(mute: Boolean) {
         _callScreenState.value = callScreenState.value.copy(isSpeakerMode = mute)
     }
     //====================SCREEN STATE END====================
@@ -80,9 +69,9 @@ class CallViewModel @Inject constructor(
     }
 
     fun onMicButtonClick() {
-        if (callScreenState.value.isMute){
+        if (callScreenState.value.isMute) {
             updateIsMute(false)
-        }else{
+        } else {
             updateIsMute(true)
         }
 //        rtcClient?.toggleAudio(/*isMute*/ callScreenState.value.isMute)
@@ -108,17 +97,15 @@ class CallViewModel @Inject constructor(
     }
 
     fun onEndCallButtonClick() {
-        updateIsCallRunning(false)
-//        setCallLayoutGone()
-//        setWhoToCallLayoutVisible()
-//        setIncomingCallLayoutGone()
+        updateIsOngoingCall(false)
+        updateIsIncomingCall(false) // todo why
 //        rtcClient?.endCall()
     }
 }
 
 data class CallScreenState(
-    val incomingCallReceived: Boolean = false,
-    val isCallRunning: Boolean = false,
+    val isIncomingCall: Boolean = false,
+    val isOngoingCall: Boolean = false,
     val isMute: Boolean = false,
     val isCameraPaused: Boolean = false,
     val isSpeakerMode: Boolean = false
