@@ -37,7 +37,7 @@ class CallFragment: Fragment(R.layout.fragment_call) {
     private val binding get() = _binding!!
 
     // todo move to the Service?
-    private val rtcAudioManager by lazy { RTCAudioManager.create(requireContext()) }
+//    private val rtcAudioManager by lazy { RTCAudioManager.create(requireContext()) }
 
     private val gson = Gson()
 
@@ -260,31 +260,19 @@ class CallFragment: Fragment(R.layout.fragment_call) {
             }
 
             micButton.setOnClickListener {
-                rtcService?.toggleAudio(!vm.callScreenState.value.isMute) // todo combine in Service
-                vm.onMicButtonClick()// todo combine in Service
+                rtcService?.toggleAudio(!vm.callScreenState.value.isMute)
             }
 
             videoButton.setOnClickListener {
                 rtcService?.toggleCamera(!vm.callScreenState.value.isCameraPaused) // todo combine in Service
-                vm.onVideoButtonClick()// todo combine in Service
             }
 
             audioOutputButton.setOnClickListener {
-                rtcAudioManager.setDefaultAudioDevice(if (!vm.callScreenState.value.isSpeakerMode) RTCAudioManager.AudioDevice.SPEAKER_PHONE // todo combine in Service
-                else RTCAudioManager.AudioDevice.EARPIECE) // todo combine in Service
-                vm.onAudioOutputButtonClick() // todo combine in Service
+                rtcService?.toggleAudioOutput()
             }
 
-            endCallButton.setOnClickListener { // doesnt't kill CallFragment. Other listeners
-                // (that call rtcClient in state.collect {} block) - kill it
-                vm.onEndCallButtonClick() // todo combine in Service
-                rtcService?.endCall() // todo combine in Service
-
-                //====================LAYOUT CONFIG====================
-//                setCallLayoutGone() // todo return to state collector?
-//                setWhoToCallLayoutVisible() // todo return to state collector?
-//                setIncomingCallLayoutGone() // todo return to state collector?
-                //====================LAYOUT CONFIG END====================
+            endCallButton.setOnClickListener {
+                rtcService?.endCall()
             }
             //====================RTC VIEW CONTROL BUTTONS END====================
         }

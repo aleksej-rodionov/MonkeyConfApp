@@ -10,6 +10,7 @@ import com.example.neopidorapp.feature_call.presentation.rtc_service.notificatio
 import com.example.neopidorapp.feature_call.presentation.rtc_service.notification.RTCNotification
 import com.example.neopidorapp.feature_call.presentation.rtc_service.notification.RTCNotificationReceiver.Companion.ACTION_END_CALL
 import com.example.neopidorapp.feature_call.presentation.rtc_service.rtc_client.PeerConnectionObserver
+import com.example.neopidorapp.feature_call.presentation.rtc_service.rtc_client.RTCAudioManager
 import com.example.neopidorapp.feature_call.presentation.rtc_service.rtc_client.RTCClientWrapper
 import com.example.neopidorapp.feature_call.presentation.rtc_service.rtc_ui_state.RTCState
 import com.example.neopidorapp.models.MessageModel
@@ -32,6 +33,7 @@ class RTCService : Service(), NotificationCallback {
     private val rtcServiceJob = SupervisorJob()
     private val rtcServiceScope = CoroutineScope(Dispatchers.Main + rtcServiceJob)
 
+    private val rtcAudioManager by lazy { RTCAudioManager.create(this) }
 
     //====================RTCCLIENT AND ITS NOTIFICATION====================
     val rtcState = RTCState()
@@ -116,20 +118,39 @@ class RTCService : Service(), NotificationCallback {
 
 
     //====================RTC WRAPPER METHODS====================
+    // todo check if there are state observers in RTCClient later on
+
     fun switchCamera() {
         rtcClientWrapper.switchCamera()
     }
 
     fun toggleAudio(mute: Boolean) {
         rtcClientWrapper.toggleAudio(mute)
+        rtcState.updateIsMute(mute)
     }
 
     fun toggleCamera(cameraPaused: Boolean) {
         rtcClientWrapper.toggleCamera(cameraPaused)
+        rtcState.updateIsCameraPaused(cameraPaused)
+    }
+
+    fun toggleAudioOutput() {
+        // todo toggle rtcAudioManager
+        rtcAudioManager.setDefaultAudioDevice(
+            if (!rtcState.currentState().isSpeakerMode) {
+                RTCAudioManager.AudioDevice.SPEAKER_PHONE
+            } else {
+                RTCAudioManager.AudioDevice.EARPIECE
+            }
+        )
+
+        rtcState.updateIsSpeakerMode(!rtcState.currentState().isSpeakerMode)
     }
 
     fun endCall() {
         rtcClientWrapper.endCall()
+        rtcState.updateIsOngoingCall(false)
+        rtcState.updateIsIncomingCall(false) // todo why
     }
     //====================RTC CONTROL METHODS END====================
     //====================RTC WRAPPER METHODS END====================

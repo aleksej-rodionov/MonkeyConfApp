@@ -76,42 +76,6 @@ class CallViewModel @Inject constructor(
         )
     }
 
-    fun onMicButtonClick() {
-        if (callScreenState.value.isMute) {
-            updateIsMute(false)
-        } else {
-            updateIsMute(true)
-        }
-//        rtcClient?.toggleAudio(/*isMute*/ callScreenState.value.isMute)
-    }
-
-    fun onVideoButtonClick() {
-        if (callScreenState.value.isCameraPaused) {
-            updateIsCameraPaused(false)
-        } else {
-            updateIsCameraPaused(true)
-        }
-//        rtcClient?.toggleCamera(/*isCameraPaused*/ callScreenState.value.isCameraPaused)
-    }
-
-    fun onAudioOutputButtonClick() {
-        if (callScreenState.value.isSpeakerMode) {
-            updateIsSpeakerMode(false)
-//            rtcAudioManager.setDefaultAudioDevice(RTCAudioManager.AudioDevice.EARPIECE)
-        } else {
-            updateIsSpeakerMode(true)
-//            rtcAudioManager.setDefaultAudioDevice(RTCAudioManager.AudioDevice.SPEAKER_PHONE)
-        }
-    }
-
-    fun onEndCallButtonClick() {
-        updateIsOngoingCall(false)
-        updateIsIncomingCall(false) // todo why
-//        rtcClient?.endCall()
-    }
-
-
-
     //====================RTC SERVICE CONNECTION====================
     private val _rtcBinderState = MutableStateFlow<RTCService.RTCBinder?>(null)
     val rtcBinderState: StateFlow<RTCService.RTCBinder?> = _rtcBinderState.asStateFlow()
