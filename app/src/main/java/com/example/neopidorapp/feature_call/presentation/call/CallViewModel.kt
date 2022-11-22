@@ -1,8 +1,12 @@
 package com.example.neopidorapp.feature_call.presentation.call
 
+import android.content.ComponentName
+import android.content.ServiceConnection
+import android.os.IBinder
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import com.example.neopidorapp.feature_call.presentation.call.socket.SocketRepo
+import com.example.neopidorapp.feature_call.presentation.rtc_service.RTCService
 import com.example.neopidorapp.models.MessageModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -14,12 +18,14 @@ import javax.inject.Inject
 class CallViewModel @Inject constructor(
     val socketRepo: SocketRepo,
     savedStateHandle: SavedStateHandle
-): ViewModel() {
+) : ViewModel() {
 
     var username = savedStateHandle.get<String>("username")
 
     var targetName: String? = null
-    fun updateTargetName(name: String) { targetName = name }
+    fun updateTargetName(name: String) {
+        targetName = name
+    }
 
     val incomingMessage = socketRepo.incomingMessage
 
@@ -29,20 +35,23 @@ class CallViewModel @Inject constructor(
     fun updateIsIncomingCall(received: Boolean) {
         _callScreenState.value = callScreenState.value.copy(isIncomingCall = received)
     }
+
     fun updateIsOngoingCall(callRunning: Boolean) {
         _callScreenState.value = callScreenState.value.copy(isOngoingCall = callRunning)
     }
+
     fun updateIsMute(mute: Boolean) {
         _callScreenState.value = callScreenState.value.copy(isMute = mute)
     }
+
     fun updateIsCameraPaused(mute: Boolean) {
         _callScreenState.value = callScreenState.value.copy(isCameraPaused = mute)
     }
+
     fun updateIsSpeakerMode(mute: Boolean) {
         _callScreenState.value = callScreenState.value.copy(isSpeakerMode = mute)
     }
     //====================SCREEN STATE END====================
-
 
 
     //===========================METHODS==============================
@@ -101,6 +110,27 @@ class CallViewModel @Inject constructor(
         updateIsIncomingCall(false) // todo why
 //        rtcClient?.endCall()
     }
+
+
+    //====================RTC SERVICE CONNECTION====================
+    private val _rtcBinderState = MutableStateFlow<RTCService.RTCBinder?>(null)
+    val rtcBinderState: StateFlow<RTCService.RTCBinder?> = _rtcBinderState.asStateFlow()
+
+    private val rtcServiceConnection = object : ServiceConnection {
+        override fun onServiceConnected(service: ComponentName?, binder: IBinder?) {
+            binder?.let {
+                val rtcBinder = it as RTCService.RTCBinder
+                _rtcBinderState.value = rtcBinder
+            }
+        }
+
+        override fun onServiceDisconnected(service: ComponentName?) {
+            _rtcBinderState.value = null
+        }
+    }
+
+    fun getRTCServiceConnection() = rtcServiceConnection
+    //====================RTC SERVICE CONNECTION END====================
 }
 
 data class CallScreenState(

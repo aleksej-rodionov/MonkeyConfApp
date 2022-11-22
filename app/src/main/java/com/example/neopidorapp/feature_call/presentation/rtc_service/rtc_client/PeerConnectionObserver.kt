@@ -1,4 +1,4 @@
-package com.example.neopidorapp.feature_call.presentation.call.rtc
+package com.example.neopidorapp.feature_call.presentation.rtc_service.rtc_client
 
 import org.webrtc.*
 

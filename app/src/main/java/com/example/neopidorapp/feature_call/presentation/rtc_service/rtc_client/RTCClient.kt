@@ -1,4 +1,4 @@
-package com.example.neopidorapp.feature_call.presentation.call.rtc
+package com.example.neopidorapp.feature_call.presentation.rtc_service.rtc_client
 
 import android.app.Application
 import android.util.Log
@@ -65,36 +65,12 @@ class RTCClient(
         Log.d(TAG, "peerConnection = $peerConnection")
     }
 
-    private fun initPeerConnectionFactory(application: Application) {
-        val peerConnectionOption = PeerConnectionFactory.InitializationOptions.builder(application)
-            .setEnableInternalTracer(true)
-            .setFieldTrials("WebRTC-H264HighProfile/Enabled/")
-            .createInitializationOptions()
-        PeerConnectionFactory.initialize(peerConnectionOption)
-    }
-
-    private fun createPeerConnectionFactory(): PeerConnectionFactory {
-        return PeerConnectionFactory.builder()
-            .setVideoEncoderFactory(
-                DefaultVideoEncoderFactory(
-                    eglContext.eglBaseContext,
-                    true,
-                    true
-                )
-            )
-            .setVideoDecoderFactory(DefaultVideoDecoderFactory(eglContext.eglBaseContext))
-            .setOptions(PeerConnectionFactory.Options().apply {
-                disableEncryption = true
-                disableNetworkMonitor = true
-            }).createPeerConnectionFactory()
-    }
-
-    private fun createPeerConnection(observer: PeerConnection.Observer): PeerConnection? {
-        return peerConnectionFactory.createPeerConnection(iceServer, observer)
-    }
-
 
     // todo review and understand functions below (they are for surface-view shit).
+
+    // and all these functions below have to be triggered from the Fragment code,
+    // but through the Service
+
     fun initializeSurfaceView(surface: SurfaceViewRenderer) {
         surface.run {
             setEnableHardwareScaler(true)
@@ -123,16 +99,6 @@ class RTCClient(
         localStream.addTrack(localVideoTrack)
 
         peerConnection?.addStream(localStream)
-    }
-
-    private fun getVideoCapturer(application: Application): CameraVideoCapturer {
-        return Camera2Enumerator(application).run {
-            deviceNames.find {
-                isFrontFacing(it)
-            }?.let {
-                createCapturer(it, null)
-            } ?: throw IllegalStateException()
-        }
     }
 
     fun call(targetName: String) {
@@ -242,6 +208,48 @@ class RTCClient(
     fun endCall() {
         peerConnection?.close()
     }
+
+
+
+    //====================PRIVATE FUNCTIONS====================
+    private fun initPeerConnectionFactory(application: Application) {
+        val peerConnectionOption = PeerConnectionFactory.InitializationOptions.builder(application)
+            .setEnableInternalTracer(true)
+            .setFieldTrials("WebRTC-H264HighProfile/Enabled/")
+            .createInitializationOptions()
+        PeerConnectionFactory.initialize(peerConnectionOption)
+    }
+
+    private fun createPeerConnectionFactory(): PeerConnectionFactory {
+        return PeerConnectionFactory.builder()
+            .setVideoEncoderFactory(
+                DefaultVideoEncoderFactory(
+                    eglContext.eglBaseContext,
+                    true,
+                    true
+                )
+            )
+            .setVideoDecoderFactory(DefaultVideoDecoderFactory(eglContext.eglBaseContext))
+            .setOptions(PeerConnectionFactory.Options().apply {
+                disableEncryption = true
+                disableNetworkMonitor = true
+            }).createPeerConnectionFactory()
+    }
+
+    private fun createPeerConnection(observer: PeerConnection.Observer): PeerConnection? {
+        return peerConnectionFactory.createPeerConnection(iceServer, observer)
+    }
+
+    private fun getVideoCapturer(application: Application): CameraVideoCapturer {
+        return Camera2Enumerator(application).run {
+            deviceNames.find {
+                isFrontFacing(it)
+            }?.let {
+                createCapturer(it, null)
+            } ?: throw IllegalStateException()
+        }
+    }
+    //====================PRIVATE FUNCTIONS END====================
 }
 
 

@@ -11,9 +11,10 @@ import androidx.lifecycle.lifecycleScope
 import com.example.neopidorapp.MainActivity
 import com.example.neopidorapp.R
 import com.example.neopidorapp.databinding.FragmentCallBinding
-import com.example.neopidorapp.feature_call.presentation.call.rtc.PeerConnectionObserver
-import com.example.neopidorapp.feature_call.presentation.call.rtc.RTCAudioManager
-import com.example.neopidorapp.feature_call.presentation.call.rtc.RTCClient
+import com.example.neopidorapp.feature_call.presentation.rtc_service.RTCService
+import com.example.neopidorapp.feature_call.presentation.rtc_service.rtc_client.PeerConnectionObserver
+import com.example.neopidorapp.feature_call.presentation.rtc_service.rtc_client.RTCAudioManager
+import com.example.neopidorapp.feature_call.presentation.rtc_service.rtc_client.RTCClient
 import com.example.neopidorapp.models.IceCandidateModel
 import com.example.neopidorapp.models.MessageModel
 import com.google.gson.Gson
@@ -27,6 +28,8 @@ private const val TAG = "CallFragment"
 
 @AndroidEntryPoint
 class CallFragment: Fragment(R.layout.fragment_call) {
+
+    private var rtcService: RTCService? = null
 
     private val vm: CallViewModel by viewModels()
 
@@ -249,7 +252,10 @@ class CallFragment: Fragment(R.layout.fragment_call) {
         }
     }
 
-
+    override fun onResume() {
+        super.onResume()
+        (activity as MainActivity).bindRTCService(vm.getRTCServiceConnection())
+    }
 
     override fun onDestroyView() {
         super.onDestroyView()
@@ -259,7 +265,7 @@ class CallFragment: Fragment(R.layout.fragment_call) {
 
 
     //====================RTCCLIENT METHODS====================
-    private fun initRtcClient() {
+    private fun initRtcClient() { // todo it goes to RTCService
         val username = vm.username
         val socketRepo = vm.socketRepo
         rtcClient = RTCClient(
