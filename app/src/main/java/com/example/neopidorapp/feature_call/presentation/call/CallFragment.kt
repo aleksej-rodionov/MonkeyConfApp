@@ -226,7 +226,15 @@ class CallFragment: Fragment(R.layout.fragment_call) {
         viewLifecycleOwner.lifecycleScope.launchWhenStarted {
             rtcService?.rtcState?.state?.collectLatest {
                 Log.d(TAG, "new rtcState = $it")
-                vm.updateState(it)
+                vm.updateState(
+                    CallScreenState(
+                    it.isIncomingCall,
+                    it.isOngoingCall,
+                    it.isMute,
+                    it.isCameraPaused,
+                    it.isSpeakerMode
+                )
+                )
             }
         }
     }
@@ -244,32 +252,33 @@ class CallFragment: Fragment(R.layout.fragment_call) {
                 vm.onCallButtonClick()
             }
 
-            switchCameraButton.setOnClickListener { // doesnt't kill CallFragment. Other listeners
-                // (that call rtcClient in state.collect {} block) - kill it
-                vm.onSwitchCameraButtonClick()
+
+
+            //====================RTC VIEW CONTROL BUTTONS====================
+            switchCameraButton.setOnClickListener {
                 rtcService?.switchCamera()
             }
 
             micButton.setOnClickListener {
-                rtcService?.toggleAudio(!vm.callScreenState.value.isMute) // todo return to state collector?
-                vm.onMicButtonClick()
+                rtcService?.toggleAudio(!vm.callScreenState.value.isMute) // todo combine in Service
+                vm.onMicButtonClick()// todo combine in Service
             }
 
             videoButton.setOnClickListener {
-                rtcService?.toggleCamera(!vm.callScreenState.value.isCameraPaused) // todo return to state collector?
-                vm.onVideoButtonClick()
+                rtcService?.toggleCamera(!vm.callScreenState.value.isCameraPaused) // todo combine in Service
+                vm.onVideoButtonClick()// todo combine in Service
             }
 
             audioOutputButton.setOnClickListener {
-                rtcAudioManager.setDefaultAudioDevice(if (!vm.callScreenState.value.isSpeakerMode) RTCAudioManager.AudioDevice.SPEAKER_PHONE // todo return to state collector?
-                else RTCAudioManager.AudioDevice.EARPIECE) // todo return to state collector?
-                vm.onAudioOutputButtonClick()
+                rtcAudioManager.setDefaultAudioDevice(if (!vm.callScreenState.value.isSpeakerMode) RTCAudioManager.AudioDevice.SPEAKER_PHONE // todo combine in Service
+                else RTCAudioManager.AudioDevice.EARPIECE) // todo combine in Service
+                vm.onAudioOutputButtonClick() // todo combine in Service
             }
 
             endCallButton.setOnClickListener { // doesnt't kill CallFragment. Other listeners
                 // (that call rtcClient in state.collect {} block) - kill it
-                vm.onEndCallButtonClick()
-                rtcService?.endCall()
+                vm.onEndCallButtonClick() // todo combine in Service
+                rtcService?.endCall() // todo combine in Service
 
                 //====================LAYOUT CONFIG====================
 //                setCallLayoutGone() // todo return to state collector?
@@ -277,6 +286,7 @@ class CallFragment: Fragment(R.layout.fragment_call) {
 //                setIncomingCallLayoutGone() // todo return to state collector?
                 //====================LAYOUT CONFIG END====================
             }
+            //====================RTC VIEW CONTROL BUTTONS END====================
         }
     }
 

@@ -8,6 +8,7 @@ import android.os.IBinder
 import com.example.neopidorapp.feature_call.presentation.call.socket.SocketRepo
 import com.example.neopidorapp.feature_call.presentation.rtc_service.notification.NotificationCallback
 import com.example.neopidorapp.feature_call.presentation.rtc_service.notification.RTCNotification
+import com.example.neopidorapp.feature_call.presentation.rtc_service.notification.RTCNotificationReceiver.Companion.ACTION_END_CALL
 import com.example.neopidorapp.feature_call.presentation.rtc_service.rtc_client.PeerConnectionObserver
 import com.example.neopidorapp.feature_call.presentation.rtc_service.rtc_client.RTCClientWrapper
 import com.example.neopidorapp.feature_call.presentation.rtc_service.rtc_ui_state.RTCState
@@ -54,7 +55,9 @@ class RTCService : Service(), NotificationCallback {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         intent?.action?.let {
             when (it) {
-                // todo
+                ACTION_END_CALL -> {
+                    endCall()
+                }
                 else -> Unit
             }
         }

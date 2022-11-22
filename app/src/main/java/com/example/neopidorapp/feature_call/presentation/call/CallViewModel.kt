@@ -35,21 +35,21 @@ class CallViewModel @Inject constructor(
     fun updateState(state: CallScreenState) {
         _callScreenState.value = state
     }
-    fun updateIsIncomingCall(received: Boolean) { // todo update all these shit from service, not from fragment
-        _callScreenState.value = callScreenState.value.copy(isIncomingCall = received)
-    }
-    fun updateIsOngoingCall(callRunning: Boolean) { // todo update all these shit from service, not from fragment
-        _callScreenState.value = callScreenState.value.copy(isOngoingCall = callRunning)
-    }
-    fun updateIsMute(mute: Boolean) { // todo update all these shit from service, not from fragment
-        _callScreenState.value = callScreenState.value.copy(isMute = mute)
-    }
-    fun updateIsCameraPaused(mute: Boolean) { // todo update all these shit from service, not from fragment
-        _callScreenState.value = callScreenState.value.copy(isCameraPaused = mute)
-    }
-    fun updateIsSpeakerMode(mute: Boolean) { // todo update all these shit from service, not from fragment
-        _callScreenState.value = callScreenState.value.copy(isSpeakerMode = mute)
-    }
+//    fun updateIsIncomingCall(received: Boolean) { // todo update all these shit from service, not from fragment
+//        _callScreenState.value = callScreenState.value.copy(isIncomingCall = received)
+//    }
+//    fun updateIsOngoingCall(callRunning: Boolean) { // todo update all these shit from service, not from fragment
+//        _callScreenState.value = callScreenState.value.copy(isOngoingCall = callRunning)
+//    }
+//    fun updateIsMute(mute: Boolean) { // todo update all these shit from service, not from fragment
+//        _callScreenState.value = callScreenState.value.copy(isMute = mute)
+//    }
+//    fun updateIsCameraPaused(mute: Boolean) { // todo update all these shit from service, not from fragment
+//        _callScreenState.value = callScreenState.value.copy(isCameraPaused = mute)
+//    }
+//    fun updateIsSpeakerMode(mute: Boolean) { // todo update all these shit from service, not from fragment
+//        _callScreenState.value = callScreenState.value.copy(isSpeakerMode = mute)
+//    }
     //====================SCREEN STATE END====================
 
 
@@ -74,10 +74,6 @@ class CallViewModel @Inject constructor(
                 null
             )
         )
-    }
-
-    fun onSwitchCameraButtonClick() {
-//        rtcClient?.switchCamera()
     }
 
     fun onMicButtonClick() {
