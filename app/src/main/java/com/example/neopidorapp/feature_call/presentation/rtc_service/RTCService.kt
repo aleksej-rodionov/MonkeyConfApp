@@ -149,8 +149,8 @@ class RTCService : Service(), NotificationCallback {
 
     fun endCall() {
         rtcClientWrapper.endCall()
-        rtcState.updateIsOngoingCall(false)
-        rtcState.updateIsIncomingCall(false) // todo why
+//        rtcState.updateIsOngoingCall(false)
+//        rtcState.updateIsIncomingCall(false) // todo why
     }
     //====================RTC CONTROL METHODS END====================
     //====================RTC WRAPPER METHODS END====================

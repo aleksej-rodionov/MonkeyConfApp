@@ -11,13 +11,13 @@ class RTCState: RTCUiStateControl {
 
     override fun currentState() = state.value
 
-    override fun updateIsIncomingCall(incomingCall: Boolean) {
-        _state.value = state.value.copy(isIncomingCall = incomingCall)
-    }
-
-    override fun updateIsOngoingCall(ongoingCall: Boolean) {
-        _state.value = state.value.copy(isOngoingCall = ongoingCall)
-    }
+//    override fun updateIsIncomingCall(incomingCall: Boolean) {
+//        _state.value = state.value.copy(isIncomingCall = incomingCall)
+//    }
+//
+//    override fun updateIsOngoingCall(ongoingCall: Boolean) {
+//        _state.value = state.value.copy(isOngoingCall = ongoingCall)
+//    }
 
     override fun updateIsMute(mute: Boolean) {
         _state.value = state.value.copy(isMute = mute)
