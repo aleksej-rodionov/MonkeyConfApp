@@ -10,8 +10,8 @@ private const val TAG = "RTCClient"
 
 class RTCClient(
     private val application: Application?,
-    private val username: String,
-    private val socketRepo: SocketRepo,
+//    private val username: String,
+//    private val socketRepo: SocketRepo,
 
     /**
      * This Observer object below, that we've passed then to our WebRtc Client,
@@ -101,7 +101,7 @@ class RTCClient(
         peerConnection?.addStream(localStream)
     }
 
-    fun call(targetName: String) {
+    fun call(targetName: String, usernameNew: String, socketRepoNew: SocketRepo) {
 
         val mediaConstraints = MediaConstraints()
         mediaConstraints.mandatory.add(MediaConstraints.KeyValuePair("OfferToReceiveVideo", "true"))
@@ -124,8 +124,9 @@ class RTCClient(
                                     "sdp" to desc?.description,
                                     "type" to desc?.type
                                 )
-                                socketRepo?.sendMessageToSocket(
-                                    MessageModel("create_offer", username, targetName, offer)
+                                socketRepoNew?.sendMessageToSocket(
+//                                    MessageModel("create_offer", username, targetName, offer)
+                                    MessageModel("create_offer", usernameNew, targetName, offer)
                                 )
                             }
 
@@ -156,7 +157,7 @@ class RTCClient(
         )
     }
 
-    fun answer(targetName: String) {
+    fun answer(targetName: String, usernameNew: String, socketRepoNew: SocketRepo) {
         val mediaConstraints = MediaConstraints()
         mediaConstraints.mandatory.add(MediaConstraints.KeyValuePair("OfferToReceiveVideo", "true"))
 
@@ -171,8 +172,9 @@ class RTCClient(
                                 "sdp" to desc?.description,
                                 "type" to desc?.type
                             )
-                            socketRepo.sendMessageToSocket(
-                                MessageModel("create_answeer", username, targetName, answer)
+                            socketRepoNew.sendMessageToSocket(
+//                                MessageModel("create_answeer", username, targetName, answer)
+                                MessageModel("create_answeer", usernameNew, targetName, answer)
                             )
                         }
 

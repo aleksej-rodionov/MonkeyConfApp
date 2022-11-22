@@ -120,7 +120,7 @@ class CallFragment: Fragment(R.layout.fragment_call) {
                                     rtcClient?.initializeSurfaceView(localView)
                                     rtcClient?.initializeSurfaceView(remoteView)
                                     rtcClient?.startLocalVideo(localView)
-                                    rtcClient?.call(targetUserNameEt.text.toString())
+                                    rtcClient?.call(targetUserNameEt.text.toString(), vm.username!!, vm.socketRepo)
                                 }
 //                            }
                         }
@@ -153,7 +153,7 @@ class CallFragment: Fragment(R.layout.fragment_call) {
                                         message.data.toString()
                                     )
                                     rtcClient?.onRemoteSessionReceived(remoteSession)
-                                    rtcClient?.answer(message.name!!)
+                                    rtcClient?.answer(message.name!!, vm.username!!, vm.socketRepo)
                                     vm.updateTargetName(message.name!!)
                                 }
                                 rejectButton.setOnClickListener {
@@ -287,12 +287,12 @@ class CallFragment: Fragment(R.layout.fragment_call) {
 
     //====================RTCCLIENT METHODS====================
     private fun initRtcClient() { // todo it goes to RTCService
-        val username = vm.username
-        val socketRepo = vm.socketRepo
+//        val username = vm.username
+//        val socketRepo = vm.socketRepo
         rtcClient = RTCClient(
             (activity as? MainActivity)?.application, // we can just write "application" cause we're inside of the Activity
-            username!!,
-            socketRepo,
+//            username!!,
+//            socketRepo,
             object : PeerConnectionObserver() {
                 override fun onIceCandidate(p0: IceCandidate?) {
                     super.onIceCandidate(p0)
@@ -304,8 +304,9 @@ class CallFragment: Fragment(R.layout.fragment_call) {
                         "sdpMLineIndex" to p0?.sdpMLineIndex,
                         "sdpCandidate" to p0?.sdp
                     )
-                    socketRepo?.sendMessageToSocket(
-                        MessageModel("ice_candidate", username, vm.targetName, candidate)
+                    vm.socketRepo?.sendMessageToSocket(
+//                        MessageModel("ice_candidate", username, vm.targetName, candidate)
+                        MessageModel("ice_candidate", vm.username, vm.targetName, candidate)
                     )
                 }
 
