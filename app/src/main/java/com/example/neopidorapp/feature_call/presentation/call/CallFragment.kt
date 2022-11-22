@@ -225,7 +225,8 @@ class CallFragment: Fragment(R.layout.fragment_call) {
     private fun initRTCStateCollector() {
         viewLifecycleOwner.lifecycleScope.launchWhenStarted {
             rtcService?.rtcState?.state?.collectLatest {
-                // todo trigger some shit in vm
+                Log.d(TAG, "new rtcState = $it")
+                vm.updateState(it)
             }
         }
     }

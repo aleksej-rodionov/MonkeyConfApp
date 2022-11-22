@@ -32,23 +32,22 @@ class CallViewModel @Inject constructor(
     //====================SCREEN STATE====================
     private val _callScreenState = MutableStateFlow(CallScreenState()) // todo must be mutable by Service state!
     val callScreenState: StateFlow<CallScreenState> = _callScreenState.asStateFlow()
-    fun updateIsIncomingCall(received: Boolean) {
+    fun updateState(state: CallScreenState) {
+        _callScreenState.value = state
+    }
+    fun updateIsIncomingCall(received: Boolean) { // todo update all these shit from service, not from fragment
         _callScreenState.value = callScreenState.value.copy(isIncomingCall = received)
     }
-
-    fun updateIsOngoingCall(callRunning: Boolean) {
+    fun updateIsOngoingCall(callRunning: Boolean) { // todo update all these shit from service, not from fragment
         _callScreenState.value = callScreenState.value.copy(isOngoingCall = callRunning)
     }
-
-    fun updateIsMute(mute: Boolean) {
+    fun updateIsMute(mute: Boolean) { // todo update all these shit from service, not from fragment
         _callScreenState.value = callScreenState.value.copy(isMute = mute)
     }
-
-    fun updateIsCameraPaused(mute: Boolean) {
+    fun updateIsCameraPaused(mute: Boolean) { // todo update all these shit from service, not from fragment
         _callScreenState.value = callScreenState.value.copy(isCameraPaused = mute)
     }
-
-    fun updateIsSpeakerMode(mute: Boolean) {
+    fun updateIsSpeakerMode(mute: Boolean) { // todo update all these shit from service, not from fragment
         _callScreenState.value = callScreenState.value.copy(isSpeakerMode = mute)
     }
     //====================SCREEN STATE END====================
