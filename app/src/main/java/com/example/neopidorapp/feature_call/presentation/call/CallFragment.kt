@@ -201,6 +201,27 @@ class CallFragment: Fragment(R.layout.fragment_call) {
                 }
             }
         }
+
+
+
+        viewLifecycleOwner.lifecycleScope.launchWhenStarted {
+            vm.rtcBinderState.collectLatest {
+                if (it != null) {
+                    rtcService = it.service
+                    initRTCStateCollector()
+                } else {
+                    rtcService = null
+                }
+            }
+        }
+    }
+
+    private fun initRTCStateCollector() {
+        viewLifecycleOwner.lifecycleScope.launchWhenStarted {
+            rtcService?.rtcState?.state?.collectLatest {
+                // todo trigger some shit in vm
+            }
+        }
     }
 
     private fun initListeners() {

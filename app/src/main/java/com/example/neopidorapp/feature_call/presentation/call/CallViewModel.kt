@@ -54,6 +54,7 @@ class CallViewModel @Inject constructor(
     //====================SCREEN STATE END====================
 
 
+
     //===========================METHODS==============================
     fun initSocket() {
         username?.let { u ->
@@ -62,6 +63,9 @@ class CallViewModel @Inject constructor(
     }
 
     //===================LISTENER METHODS======================
+    // somewhere here must be methods updating view state,
+    // triggered by shit emited from RTCService.RTCClient.state
+
     fun onCallButtonClick() {
         socketRepo.sendMessageToSocket(
             MessageModel(
@@ -110,6 +114,7 @@ class CallViewModel @Inject constructor(
         updateIsIncomingCall(false) // todo why
 //        rtcClient?.endCall()
     }
+
 
 
     //====================RTC SERVICE CONNECTION====================

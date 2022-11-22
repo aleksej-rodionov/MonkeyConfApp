@@ -31,11 +31,21 @@ class MainActivity : AppCompatActivity() {
     override fun onSupportNavigateUp(): Boolean {
         return navController.navigateUp() || super.onSupportNavigateUp()
     }
-    
+
+    override fun onResume() {
+        super.onResume()
+        startRTCService()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        stopRTCService()
+    }
+
     
     
     //====================RTC SERVICE====================
-    private fun startService() {
+    private fun startRTCService() {
         val serviceIntent = Intent(this, RTCService::class.java)
         startService(serviceIntent)
     }
@@ -45,6 +55,8 @@ class MainActivity : AppCompatActivity() {
         bindService(serviceIntent, conn, Context.BIND_AUTO_CREATE)
     }
 
-
+    fun stopRTCService() {
+        stopService(Intent(this, RTCService::class.java))
+    }
     //====================RTC SERVICE END====================
 }
