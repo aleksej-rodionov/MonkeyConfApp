@@ -14,7 +14,6 @@ import com.example.neopidorapp.databinding.FragmentCallBinding
 import com.example.neopidorapp.feature_call.presentation.rtc_service.RTCService
 import com.example.neopidorapp.feature_call.presentation.rtc_service.rtc_client.PeerConnectionObserver
 import com.example.neopidorapp.feature_call.presentation.rtc_service.rtc_client.RTCAudioManager
-import com.example.neopidorapp.feature_call.presentation.rtc_service.rtc_client.RTCClient
 import com.example.neopidorapp.models.IceCandidateModel
 import com.example.neopidorapp.models.MessageModel
 import com.google.gson.Gson
@@ -30,6 +29,7 @@ private const val TAG = "CallFragment"
 class CallFragment: Fragment(R.layout.fragment_call) {
 
     private var rtcService: RTCService? = null
+    private var peerConnectionObserver: PeerConnectionObserver? = null
 
     private val vm: CallViewModel by viewModels()
 
@@ -39,7 +39,7 @@ class CallFragment: Fragment(R.layout.fragment_call) {
     // todo move to the Service?
     private val rtcAudioManager by lazy { RTCAudioManager.create(requireContext()) }
     // todo move to the Service?
-    private var rtcClient: RTCClient? = null
+//    private var rtcClient: RTCClient? = null
 
     private val gson = Gson()
 
@@ -51,7 +51,9 @@ class CallFragment: Fragment(R.layout.fragment_call) {
         initListeners()
 
         vm.initSocket()
-        initRtcClient()
+
+//        initPeerConnectionObserver() // todo where to call it? in onViewCreated() or rtcBinderState.collectLatest {} ??
+//        initRtcClient()
     }
 
     private fun initObservers() {
@@ -208,6 +210,11 @@ class CallFragment: Fragment(R.layout.fragment_call) {
             vm.rtcBinderState.collectLatest {
                 if (it != null) {
                     rtcService = it.service
+                    initPeerConnectionObserver()
+                    rtcService?.rtcClientWrapper?.initRtcClient(
+                        (activity as MainActivity).application,
+                        peerConnectionObserver!!
+                    )
                     initRTCStateCollector()
                 } else {
                     rtcService = null
@@ -285,43 +292,37 @@ class CallFragment: Fragment(R.layout.fragment_call) {
 
 
 
-    //====================RTCCLIENT METHODS====================
-    private fun initRtcClient() { // todo it goes to RTCService
-//        val username = vm.username
-//        val socketRepo = vm.socketRepo
-        rtcClient = RTCClient(
-            (activity as? MainActivity)?.application, // we can just write "application" cause we're inside of the Activity
-//            username!!,
-//            socketRepo,
-            object : PeerConnectionObserver() {
-                override fun onIceCandidate(p0: IceCandidate?) {
-                    super.onIceCandidate(p0)
-                    rtcClient?.addIceCandidate(p0) // we add an ICE Candidate...
-                    // ... and it's time to send this ICE Candidate to our peer:
-                    // SENDING ICE CANDIDATE:
-                    val candidate = hashMapOf(
-                        "sdpMid" to p0?.sdpMid,
-                        "sdpMLineIndex" to p0?.sdpMLineIndex,
-                        "sdpCandidate" to p0?.sdp
-                    )
-                    vm.socketRepo?.sendMessageToSocket(
+    //====================PRIVATE METHODS====================
+    private fun initPeerConnectionObserver() {
+        peerConnectionObserver = object : PeerConnectionObserver() {
+            override fun onIceCandidate(p0: IceCandidate?) {
+                super.onIceCandidate(p0)
+                rtcService?.rtcClientWrapper?.addIceCandidate(p0)
+                /**
+                 * we add an ICE Candidate above...
+                 * ... and it's time to send this ICE Candidate to our peer:
+                 * SENDING ICE CANDIDATE:
+                 */
+                val candidate = hashMapOf(
+                    "sdpMid" to p0?.sdpMid,
+                    "sdpMLineIndex" to p0?.sdpMLineIndex,
+                    "sdpCandidate" to p0?.sdp
+                )
+                vm.socketRepo?.sendMessageToSocket(
 //                        MessageModel("ice_candidate", username, vm.targetName, candidate)
-                        MessageModel("ice_candidate", vm.username, vm.targetName, candidate)
-                    )
-                }
-
-                override fun onAddStream(p0: MediaStream?) {
-                    super.onAddStream(p0)
-                    p0?.videoTracks?.get(0)?.addSink(binding.remoteView)
-                }
+                    MessageModel("ice_candidate", vm.username, vm.targetName, candidate)
+                )
             }
-        )
+
+            override fun onAddStream(p0: MediaStream?) {
+                super.onAddStream(p0)
+                p0?.videoTracks?.get(0)?.addSink(binding.remoteView)
+            }
+        }
     }
-    //====================RTCCLIENT METHODS END====================
 
 
 
-//====================PRIVATE METHODS====================
     private fun setIncomingCallLayoutGone() {
         binding.incomingCallLayout.visibility = View.GONE
     }
