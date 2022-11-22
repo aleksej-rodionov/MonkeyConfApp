@@ -30,7 +30,7 @@ class CallViewModel @Inject constructor(
     val incomingMessage = socketRepo.incomingMessage
 
     //====================SCREEN STATE====================
-    private val _callScreenState = MutableStateFlow(CallScreenState())
+    private val _callScreenState = MutableStateFlow(CallScreenState()) // todo must be mutable by Service state!
     val callScreenState: StateFlow<CallScreenState> = _callScreenState.asStateFlow()
     fun updateIsIncomingCall(received: Boolean) {
         _callScreenState.value = callScreenState.value.copy(isIncomingCall = received)

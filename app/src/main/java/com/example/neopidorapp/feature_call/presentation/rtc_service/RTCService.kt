@@ -1,11 +1,14 @@
 package com.example.neopidorapp.feature_call.presentation.rtc_service
 
+import android.app.Application
 import android.app.Service
 import android.content.Intent
 import android.os.Binder
 import android.os.IBinder
+import com.example.neopidorapp.feature_call.presentation.call.socket.SocketRepo
 import com.example.neopidorapp.feature_call.presentation.rtc_service.notification.NotificationCallback
 import com.example.neopidorapp.feature_call.presentation.rtc_service.notification.RTCNotification
+import com.example.neopidorapp.feature_call.presentation.rtc_service.rtc_client.PeerConnectionObserver
 import com.example.neopidorapp.feature_call.presentation.rtc_service.rtc_client.RTCClientWrapper
 import com.example.neopidorapp.feature_call.presentation.rtc_service.rtc_ui_state.RTCState
 import com.example.neopidorapp.models.MessageModel
@@ -16,6 +19,8 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import org.webrtc.IceCandidate
 import org.webrtc.MediaStream
+import org.webrtc.SessionDescription
+import org.webrtc.SurfaceViewRenderer
 
 @AndroidEntryPoint
 class RTCService : Service(), NotificationCallback {
@@ -78,10 +83,51 @@ class RTCService : Service(), NotificationCallback {
         notification.launchNotificationJob()
     }
     //====================OVERRIDDEN NOTIFICATION_CALLBACK METHODS END====================
+    fun initRtcClient(application: Application, observer: PeerConnectionObserver) {
+        rtcClientWrapper.initRtcClient(application, observer)
+    }
+
+    fun initializeSurfaceView(surface: SurfaceViewRenderer) {
+        rtcClientWrapper.initializeSurfaceView(surface)
+    }
+
+    fun startLocalVideo(surface: SurfaceViewRenderer) {
+        rtcClientWrapper.startLocalVideo(surface)
+    }
+
+    fun call(targetName: String, username: String, socketRepo: SocketRepo) {
+        rtcClientWrapper.call(targetName, username, socketRepo)
+    }
+
+    fun onRemoteSessionReceived(remoteSession: SessionDescription) {
+        rtcClientWrapper.onRemoteSessionReceived(remoteSession)
+    }
+
+    fun answer(targetName: String, username: String, socketRepo: SocketRepo) {
+        rtcClientWrapper.answer(targetName, username, socketRepo)
+    }
+
+    fun addIceCandidate(p0: IceCandidate?) {
+        rtcClientWrapper.addIceCandidate(p0)
+    }
 
 
+    //====================RTC WRAPPER METHODS====================
+    fun switchCamera() {
+        rtcClientWrapper.switchCamera()
+    }
 
-    //====================RTC_CLIENT CONTROL METHODS====================
-    // initRtcClient() = rtcClientWrapper.initRtcClient() // todo
-    //====================RTC_CLIENT CONTROL METHODS END====================
+    fun toggleAudio(mute: Boolean) {
+        rtcClientWrapper.toggleAudio(mute)
+    }
+
+    fun toggleCamera(cameraPaused: Boolean) {
+        rtcClientWrapper.toggleCamera(cameraPaused)
+    }
+
+    fun endCall() {
+        rtcClientWrapper.endCall()
+    }
+    //====================RTC CONTROL METHODS END====================
+    //====================RTC WRAPPER METHODS END====================
 }

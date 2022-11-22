@@ -38,8 +38,6 @@ class CallFragment: Fragment(R.layout.fragment_call) {
 
     // todo move to the Service?
     private val rtcAudioManager by lazy { RTCAudioManager.create(requireContext()) }
-    // todo move to the Service?
-//    private var rtcClient: RTCClient? = null
 
     private val gson = Gson()
 
@@ -52,7 +50,8 @@ class CallFragment: Fragment(R.layout.fragment_call) {
 
         vm.initSocket()
 
-//        initPeerConnectionObserver() // todo where to call it? in onViewCreated() or rtcBinderState.collectLatest {} ??
+        // todo where to call it? in onViewCreated() or rtcBinderState.collectLatest {} ??
+//        initPeerConnectionObserver()
 //        initRtcClient()
     }
 
@@ -119,10 +118,10 @@ class CallFragment: Fragment(R.layout.fragment_call) {
                             //====================LAYOUT CONFIG END====================
 
                                 binding.apply {
-                                    rtcClient?.initializeSurfaceView(localView)
-                                    rtcClient?.initializeSurfaceView(remoteView)
-                                    rtcClient?.startLocalVideo(localView)
-                                    rtcClient?.call(targetUserNameEt.text.toString(), vm.username!!, vm.socketRepo)
+                                    rtcService?.initializeSurfaceView(localView)
+                                    rtcService?.initializeSurfaceView(remoteView)
+                                    rtcService?.startLocalVideo(localView)
+                                    rtcService?.call(targetUserNameEt.text.toString(), vm.username!!, vm.socketRepo)
                                 }
 //                            }
                         }
@@ -147,15 +146,15 @@ class CallFragment: Fragment(R.layout.fragment_call) {
                                     vm.updateIsOngoingCall(true)
                                     //====================LAYOUT CONFIG END====================
 
-                                    rtcClient?.initializeSurfaceView(localView)
-                                    rtcClient?.initializeSurfaceView(remoteView)
-                                    rtcClient?.startLocalVideo(localView)
+                                    rtcService?.initializeSurfaceView(localView)
+                                    rtcService?.initializeSurfaceView(remoteView)
+                                    rtcService?.startLocalVideo(localView)
                                     val remoteSession = SessionDescription(
                                         SessionDescription.Type.OFFER,
                                         message.data.toString()
                                     )
-                                    rtcClient?.onRemoteSessionReceived(remoteSession)
-                                    rtcClient?.answer(message.name!!, vm.username!!, vm.socketRepo)
+                                    rtcService?.onRemoteSessionReceived(remoteSession)
+                                    rtcService?.answer(message.name!!, vm.username!!, vm.socketRepo)
                                     vm.updateTargetName(message.name!!)
                                 }
                                 rejectButton.setOnClickListener {
@@ -175,7 +174,7 @@ class CallFragment: Fragment(R.layout.fragment_call) {
                             SessionDescription.Type.ANSWER,
                             message.data.toString()
                         )
-                        rtcClient?.onRemoteSessionReceived(session)
+                        rtcService?.onRemoteSessionReceived(session)
 //                        runOnUiThread {
                             binding.remoteViewLoading.visibility = View.GONE
 //                        }
@@ -188,7 +187,7 @@ class CallFragment: Fragment(R.layout.fragment_call) {
                                     gson.toJson(message.data),
                                     IceCandidateModel::class.java
                                 )
-                                rtcClient?.addIceCandidate(
+                                rtcService?.addIceCandidate(
                                     IceCandidate(
                                         receivedIceCandidate.sdpMid,
                                         Math.toIntExact(receivedIceCandidate.sdpMLineIndex.toLong()),
@@ -211,7 +210,7 @@ class CallFragment: Fragment(R.layout.fragment_call) {
                 if (it != null) {
                     rtcService = it.service
                     initPeerConnectionObserver()
-                    rtcService?.rtcClientWrapper?.initRtcClient(
+                    rtcService?.initRtcClient(
                         (activity as MainActivity).application,
                         peerConnectionObserver!!
                     )
@@ -247,16 +246,16 @@ class CallFragment: Fragment(R.layout.fragment_call) {
             switchCameraButton.setOnClickListener { // doesnt't kill CallFragment. Other listeners
                 // (that call rtcClient in state.collect {} block) - kill it
                 vm.onSwitchCameraButtonClick()
-                rtcClient?.switchCamera()
+                rtcService?.switchCamera()
             }
 
             micButton.setOnClickListener {
-                rtcClient?.toggleAudio(!vm.callScreenState.value.isMute) // todo return to state collector?
+                rtcService?.toggleAudio(!vm.callScreenState.value.isMute) // todo return to state collector?
                 vm.onMicButtonClick()
             }
 
             videoButton.setOnClickListener {
-                rtcClient?.toggleCamera(!vm.callScreenState.value.isCameraPaused) // todo return to state collector?
+                rtcService?.toggleCamera(!vm.callScreenState.value.isCameraPaused) // todo return to state collector?
                 vm.onVideoButtonClick()
             }
 
@@ -269,7 +268,7 @@ class CallFragment: Fragment(R.layout.fragment_call) {
             endCallButton.setOnClickListener { // doesnt't kill CallFragment. Other listeners
                 // (that call rtcClient in state.collect {} block) - kill it
                 vm.onEndCallButtonClick()
-                rtcClient?.endCall()
+                rtcService?.endCall()
 
                 //====================LAYOUT CONFIG====================
 //                setCallLayoutGone() // todo return to state collector?
@@ -297,7 +296,7 @@ class CallFragment: Fragment(R.layout.fragment_call) {
         peerConnectionObserver = object : PeerConnectionObserver() {
             override fun onIceCandidate(p0: IceCandidate?) {
                 super.onIceCandidate(p0)
-                rtcService?.rtcClientWrapper?.addIceCandidate(p0)
+                rtcService?.addIceCandidate(p0)
                 /**
                  * we add an ICE Candidate above...
                  * ... and it's time to send this ICE Candidate to our peer:

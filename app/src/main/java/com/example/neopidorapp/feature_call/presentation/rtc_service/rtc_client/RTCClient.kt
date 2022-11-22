@@ -62,7 +62,6 @@ class RTCClient(
 
 
     // todo review and understand functions below (they are for surface-view shit).
-
     // and all these functions below have to be triggered from the Fragment code,
     // but through the Service
 
@@ -96,7 +95,7 @@ class RTCClient(
         peerConnection?.addStream(localStream)
     }
 
-    fun call(targetName: String, usernameNew: String, socketRepoNew: SocketRepo) {
+    fun call(targetName: String, username: String, socketRepo: SocketRepo) {
 
         val mediaConstraints = MediaConstraints()
         mediaConstraints.mandatory.add(MediaConstraints.KeyValuePair("OfferToReceiveVideo", "true"))
@@ -119,9 +118,8 @@ class RTCClient(
                                     "sdp" to desc?.description,
                                     "type" to desc?.type
                                 )
-                                socketRepoNew?.sendMessageToSocket(
-//                                    MessageModel("create_offer", username, targetName, offer)
-                                    MessageModel("create_offer", usernameNew, targetName, offer)
+                                socketRepo.sendMessageToSocket(
+                                    MessageModel("create_offer", username, targetName, offer)
                                 )
                             }
 
@@ -152,7 +150,7 @@ class RTCClient(
         )
     }
 
-    fun answer(targetName: String, usernameNew: String, socketRepoNew: SocketRepo) {
+    fun answer(targetName: String, username: String, socketRepo: SocketRepo) {
         val mediaConstraints = MediaConstraints()
         mediaConstraints.mandatory.add(MediaConstraints.KeyValuePair("OfferToReceiveVideo", "true"))
 
@@ -167,9 +165,8 @@ class RTCClient(
                                 "sdp" to desc?.description,
                                 "type" to desc?.type
                             )
-                            socketRepoNew.sendMessageToSocket(
-//                                MessageModel("create_answeer", username, targetName, answer)
-                                MessageModel("create_answeer", usernameNew, targetName, answer)
+                            socketRepo.sendMessageToSocket(
+                                MessageModel("create_answeer", username, targetName, answer)
                             )
                         }
 
