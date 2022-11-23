@@ -105,20 +105,14 @@ class CallFragment: Fragment(R.layout.fragment_call) {
                 when (message.type) {
                     "call_response" -> {
                         if (message.data == "user is not online") {
-//                            runOnUiThread { // we have to run it on the UI thread because we're on the Socket thread
-                            Toast.makeText(
+                            Toast.makeText( // todo handle through Service.state
                                 requireContext(),
                                 "user is not online",
                                 Toast.LENGTH_LONG
                             ).show()
-//                            }
                         } else {
-//                            runOnUiThread { // we have to run it on the UI thread because we're on the Socket thread
-
                             //====================LAYOUT CONFIG====================
-//                                setWhoToCallLayoutGone() // todo handle through state
-//                                setCallLayoutVisible() // todo handle through state
-//                                vm.updateIsOngoingCall(true)
+//                                vm.updateIsOngoingCall(true) // todo handle through Service.state!!
                             rtcService?.updateIsOngoingCall(true)
                             //====================LAYOUT CONFIG END====================
 
@@ -132,30 +126,27 @@ class CallFragment: Fragment(R.layout.fragment_call) {
                                     vm.socketRepo
                                 )
                             }
-//                            }
                         }
                     }
                     "offer_received" -> {
-//                        runOnUiThread {
 
                         //====================LAYOUT CONFIG====================
-//                            setIncomingCallLayoutVisible() // todo handle through state
-//                            vm.updateIsIncomingCall(true)
-                        rtcService?.updateIsIncomingCall(true)
+                            vm.updateIsIncomingCall(true) // todo handle through Service.state!!
+//                        rtcService?.updateIsIncomingCall(true)
                         //====================LAYOUT CONFIG END====================
 
                         binding.apply {
                             incomingNameTV.text = "${message.name.toString()} is calling you"
-                            acceptButton.setOnClickListener {
+                            acceptButton.setOnClickListener { // todo handle through Service.state
 
                                 //====================LAYOUT CONFIG====================
-                                setIncomingCallLayoutGone() // todo handle through state
-                                setCallLayoutVisible() // todo handle through state
-                                setWhoToCallLayoutGone() // todo handle through state
-//                                vm.updateIsIncomingCall(false)
-//                                vm.updateIsOngoingCall(true)
-                                rtcService?.updateIsIncomingCall(false)
-                                rtcService?.updateIsOngoingCall(true)
+                                setIncomingCallLayoutGone() // todo handle through Service.state
+                                setCallLayoutVisible()  // todo handle through Service.state
+                                setWhoToCallLayoutGone()  // todo handle through Service.state
+                                vm.updateIsIncomingCall(false) // todo handle through Service.state!!
+                                vm.updateIsOngoingCall(true) // todo handle through Service.state!!
+//                                rtcService?.updateIsIncomingCall(false)
+//                                rtcService?.updateIsOngoingCall(true)
                                 //====================LAYOUT CONFIG END====================
 
                                 rtcService?.initializeSurfaceView(localView)
@@ -167,20 +158,19 @@ class CallFragment: Fragment(R.layout.fragment_call) {
                                 )
                                 rtcService?.onRemoteSessionReceived(remoteSession)
                                 rtcService?.answer(message.name!!, vm.username!!, vm.socketRepo)
-                                vm.updateTargetName(message.name!!)
+                                vm.updateTargetName(message.name!!) // todo handle through Service.state
                             }
                             rejectButton.setOnClickListener {
 
                                 //====================LAYOUT CONFIG====================
-                                setIncomingCallLayoutGone() // todo handle through state
-//                                vm.updateIsIncomingCall(false)
-                                rtcService?.updateIsIncomingCall(false)
+                                setIncomingCallLayoutGone() // todo handle through Service.state
+                                vm.updateIsIncomingCall(false) // todo handle through Service.state!!
+//                                rtcService?.updateIsIncomingCall(false)
                                 //====================LAYOUT CONFIG END====================
 
                             }
                             remoteViewLoading.visibility = View.GONE
                         }
-//                        }
                     }
                     "answer_received" -> {
                         val session = SessionDescription(
@@ -188,13 +178,10 @@ class CallFragment: Fragment(R.layout.fragment_call) {
                             message.data.toString()
                         )
                         rtcService?.onRemoteSessionReceived(session)
-//                        runOnUiThread {
                         binding.remoteViewLoading.visibility = View.GONE
-//                        }
                     }
                     "ice_candidate" -> {
                         // RECEIVING ICE CANDIDATE:
-//                        runOnUiThread {
                         try {
                             val receivedIceCandidate = gson.fromJson(
                                 gson.toJson(message.data),
@@ -210,7 +197,6 @@ class CallFragment: Fragment(R.layout.fragment_call) {
                         } catch (e: Exception) {
                             e.printStackTrace()
                         }
-//                        }
                     }
                 }
             }
@@ -241,12 +227,12 @@ class CallFragment: Fragment(R.layout.fragment_call) {
                 Log.d(TAG, "new rtcState = $it")
                 vm.updateState(
                     CallScreenState(
-                    it.isIncomingCall,
-                    it.isOngoingCall,
-                    it.isMute,
-                    it.isCameraPaused,
-                    it.isSpeakerMode
-                )
+                        it.isIncomingCall,
+                        it.isOngoingCall,
+                        it.isMute,
+                        it.isCameraPaused,
+                        it.isSpeakerMode
+                    )
                 )
             }
         }
