@@ -106,7 +106,11 @@ class CallFragment: Fragment(R.layout.fragment_call) {
                     "call_response" -> {
                         if (message.data == "user is not online") {
 //                            runOnUiThread { // we have to run it on the UI thread because we're on the Socket thread
-                                Toast.makeText(requireContext(), "user is not online", Toast.LENGTH_LONG).show()
+                            Toast.makeText(
+                                requireContext(),
+                                "user is not online",
+                                Toast.LENGTH_LONG
+                            ).show()
 //                            }
                         } else {
 //                            runOnUiThread { // we have to run it on the UI thread because we're on the Socket thread
@@ -114,15 +118,20 @@ class CallFragment: Fragment(R.layout.fragment_call) {
                             //====================LAYOUT CONFIG====================
 //                                setWhoToCallLayoutGone() // todo handle through state
 //                                setCallLayoutVisible() // todo handle through state
-                                vm.updateIsOngoingCall(true)
+//                                vm.updateIsOngoingCall(true)
+                            rtcService?.updateIsOngoingCall(true)
                             //====================LAYOUT CONFIG END====================
 
-                                binding.apply {
-                                    rtcService?.initializeSurfaceView(localView)
-                                    rtcService?.initializeSurfaceView(remoteView)
-                                    rtcService?.startLocalVideo(localView)
-                                    rtcService?.call(targetUserNameEt.text.toString(), vm.username!!, vm.socketRepo)
-                                }
+                            binding.apply {
+                                rtcService?.initializeSurfaceView(localView)
+                                rtcService?.initializeSurfaceView(remoteView)
+                                rtcService?.startLocalVideo(localView)
+                                rtcService?.call(
+                                    targetUserNameEt.text.toString(),
+                                    vm.username!!,
+                                    vm.socketRepo
+                                )
+                            }
 //                            }
                         }
                     }
@@ -131,42 +140,46 @@ class CallFragment: Fragment(R.layout.fragment_call) {
 
                         //====================LAYOUT CONFIG====================
 //                            setIncomingCallLayoutVisible() // todo handle through state
-                            vm.updateIsIncomingCall(true)
+//                            vm.updateIsIncomingCall(true)
+                        rtcService?.updateIsIncomingCall(true)
                         //====================LAYOUT CONFIG END====================
 
-                            binding.apply {
-                                incomingNameTV.text = "${message.name.toString()} is calling you"
-                                acceptButton.setOnClickListener {
+                        binding.apply {
+                            incomingNameTV.text = "${message.name.toString()} is calling you"
+                            acceptButton.setOnClickListener {
 
-                                    //====================LAYOUT CONFIG====================
-                                    setIncomingCallLayoutGone() // todo handle through state
-                                    setCallLayoutVisible() // todo handle through state
-                                    setWhoToCallLayoutGone() // todo handle through state
-                                    vm.updateIsIncomingCall(false)
-                                    vm.updateIsOngoingCall(true)
-                                    //====================LAYOUT CONFIG END====================
+                                //====================LAYOUT CONFIG====================
+                                setIncomingCallLayoutGone() // todo handle through state
+                                setCallLayoutVisible() // todo handle through state
+                                setWhoToCallLayoutGone() // todo handle through state
+//                                vm.updateIsIncomingCall(false)
+//                                vm.updateIsOngoingCall(true)
+                                rtcService?.updateIsIncomingCall(false)
+                                rtcService?.updateIsOngoingCall(true)
+                                //====================LAYOUT CONFIG END====================
 
-                                    rtcService?.initializeSurfaceView(localView)
-                                    rtcService?.initializeSurfaceView(remoteView)
-                                    rtcService?.startLocalVideo(localView)
-                                    val remoteSession = SessionDescription(
-                                        SessionDescription.Type.OFFER,
-                                        message.data.toString()
-                                    )
-                                    rtcService?.onRemoteSessionReceived(remoteSession)
-                                    rtcService?.answer(message.name!!, vm.username!!, vm.socketRepo)
-                                    vm.updateTargetName(message.name!!)
-                                }
-                                rejectButton.setOnClickListener {
-
-                                    //====================LAYOUT CONFIG====================
-                                    setIncomingCallLayoutGone() // todo handle through state
-                                    vm.updateIsIncomingCall(false)
-                                    //====================LAYOUT CONFIG END====================
-
-                                }
-                                remoteViewLoading.visibility = View.GONE
+                                rtcService?.initializeSurfaceView(localView)
+                                rtcService?.initializeSurfaceView(remoteView)
+                                rtcService?.startLocalVideo(localView)
+                                val remoteSession = SessionDescription(
+                                    SessionDescription.Type.OFFER,
+                                    message.data.toString()
+                                )
+                                rtcService?.onRemoteSessionReceived(remoteSession)
+                                rtcService?.answer(message.name!!, vm.username!!, vm.socketRepo)
+                                vm.updateTargetName(message.name!!)
                             }
+                            rejectButton.setOnClickListener {
+
+                                //====================LAYOUT CONFIG====================
+                                setIncomingCallLayoutGone() // todo handle through state
+//                                vm.updateIsIncomingCall(false)
+                                rtcService?.updateIsIncomingCall(false)
+                                //====================LAYOUT CONFIG END====================
+
+                            }
+                            remoteViewLoading.visibility = View.GONE
+                        }
 //                        }
                     }
                     "answer_received" -> {
@@ -176,27 +189,27 @@ class CallFragment: Fragment(R.layout.fragment_call) {
                         )
                         rtcService?.onRemoteSessionReceived(session)
 //                        runOnUiThread {
-                            binding.remoteViewLoading.visibility = View.GONE
+                        binding.remoteViewLoading.visibility = View.GONE
 //                        }
                     }
                     "ice_candidate" -> {
                         // RECEIVING ICE CANDIDATE:
 //                        runOnUiThread {
-                            try {
-                                val receivedIceCandidate = gson.fromJson(
-                                    gson.toJson(message.data),
-                                    IceCandidateModel::class.java
+                        try {
+                            val receivedIceCandidate = gson.fromJson(
+                                gson.toJson(message.data),
+                                IceCandidateModel::class.java
+                            )
+                            rtcService?.addIceCandidate(
+                                IceCandidate(
+                                    receivedIceCandidate.sdpMid,
+                                    Math.toIntExact(receivedIceCandidate.sdpMLineIndex.toLong()),
+                                    receivedIceCandidate.sdpCandidate
                                 )
-                                rtcService?.addIceCandidate(
-                                    IceCandidate(
-                                        receivedIceCandidate.sdpMid,
-                                        Math.toIntExact(receivedIceCandidate.sdpMLineIndex.toLong()),
-                                        receivedIceCandidate.sdpCandidate
-                                    )
-                                )
-                            } catch (e: Exception) {
-                                e.printStackTrace()
-                            }
+                            )
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                        }
 //                        }
                     }
                 }

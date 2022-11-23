@@ -119,6 +119,13 @@ class RTCService : Service(), NotificationCallback {
 
     //====================RTC WRAPPER METHODS====================
     // todo check if there are state observers in RTCClient later on
+    fun updateIsIncomingCall(incoming: Boolean) {
+        rtcState.updateIsIncomingCall(incoming)
+    }
+
+    fun updateIsOngoingCall(ongoing: Boolean) {
+        rtcState.updateIsOngoingCall(ongoing)
+    }
 
     fun switchCamera() {
         rtcClientWrapper.switchCamera()
