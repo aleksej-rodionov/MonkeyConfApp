@@ -27,10 +27,16 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity><activity
-            android:name=".CallActivity"
-            android:exported="true">
         </activity>
+<!--        <activity-->
+<!--            android:name=".CallActivity"-->
+<!--            android:exported="true">-->
+<!--        </activity>-->
+
+        <service android:name=".feature_call.presentation.rtc_service.RTCService" />
+
+        <receiver android:name=".feature_call.presentation.rtc_service.notification.RTCNotificationReceiver" />
+
     </application>
 
 </manifest>

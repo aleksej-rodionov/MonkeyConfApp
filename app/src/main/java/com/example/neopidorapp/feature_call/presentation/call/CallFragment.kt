@@ -85,18 +85,12 @@ class CallFragment: Fragment(R.layout.fragment_call) {
 
                     micButton.setImageResource(if (state.isMute) R.drawable.ic_baseline_mic_24
                     else R.drawable.ic_baseline_mic_off_24)
-//                    rtcClient?.toggleAudio(state.isMute)
 
                     videoButton.setImageResource(if (state.isCameraPaused) R.drawable.ic_baseline_videocam_off_24
                     else R.drawable.ic_baseline_videocam_24)
-//                    rtcClient?.toggleCamera(state.isCameraPaused)
 
                     audioOutputButton.setImageResource(if (state.isSpeakerMode) R.drawable.ic_baseline_cameraswitch_24
                     else R.drawable.ic_baseline_hearing_24)
-
-                    // todo move to the Service?
-//                    rtcAudioManager.setDefaultAudioDevice(if (state.isSpeakerMode) RTCAudioManager.AudioDevice.SPEAKER_PHONE
-//                    else RTCAudioManager.AudioDevice.EARPIECE)
                 }
             }
         }
@@ -114,8 +108,8 @@ class CallFragment: Fragment(R.layout.fragment_call) {
                             ).show()
                         } else {
                             //====================LAYOUT CONFIG====================
-//                                vm.updateIsOngoingCall(true) // todo handle through Service.state!!
-                            rtcService?.updateIsOngoingCall(true)
+                                vm.updateIsOngoingCall(true) // todo handle through Service.state!!
+//                            rtcService?.updateIsOngoingCall(true)
                             //====================LAYOUT CONFIG END====================
 
                             binding.apply {
@@ -225,17 +219,49 @@ class CallFragment: Fragment(R.layout.fragment_call) {
 
     private fun initRTCStateCollector() {
         viewLifecycleOwner.lifecycleScope.launchWhenStarted {
-            rtcService?.rtcState?.state?.collectLatest {
-                Log.d(TAG_STATE_SERVICE, "$it")
+            rtcService?.rtcState?.state?.collectLatest { state ->
+                Log.d(TAG_STATE_SERVICE, "$state")
                 vm.updateStateToDisplay(
                     CallScreenState(
-                        it.isIncomingCall,
-                        it.isOngoingCall,
-                        it.isMute,
-                        it.isCameraPaused,
-                        it.isSpeakerMode
+                        state.isIncomingCall,
+                        state.isOngoingCall,
+                        state.isMute,
+                        state.isCameraPaused,
+                        state.isSpeakerMode
                     )
                 )
+
+                binding.apply {
+
+                    //====================LAYOUT CONFIG====================
+                    if (state.isIncomingCall && !state.isOngoingCall) {
+                        setIncomingCallLayoutVisible()
+                        setCallLayoutGone()
+                        setWhoToCallLayoutGone()
+                    } else if (!state.isIncomingCall && state.isOngoingCall) {
+                        setIncomingCallLayoutGone()
+                        setCallLayoutVisible()
+                        setWhoToCallLayoutGone()
+                    } else if (state.isIncomingCall && state.isOngoingCall) {
+                        setIncomingCallLayoutVisible()
+                        setCallLayoutVisible()
+                        setWhoToCallLayoutGone()
+                    } else if (!state.isIncomingCall && !state.isOngoingCall) {
+                        setIncomingCallLayoutGone()
+                        setCallLayoutGone()
+                        setWhoToCallLayoutVisible()
+                    }
+                    //====================LAYOUT CONFIG END====================
+
+                    micButton.setImageResource(if (state.isMute) R.drawable.ic_baseline_mic_24
+                    else R.drawable.ic_baseline_mic_off_24)
+
+                    videoButton.setImageResource(if (state.isCameraPaused) R.drawable.ic_baseline_videocam_off_24
+                    else R.drawable.ic_baseline_videocam_24)
+
+                    audioOutputButton.setImageResource(if (state.isSpeakerMode) R.drawable.ic_baseline_cameraswitch_24
+                    else R.drawable.ic_baseline_hearing_24)
+                }
             }
         }
     }

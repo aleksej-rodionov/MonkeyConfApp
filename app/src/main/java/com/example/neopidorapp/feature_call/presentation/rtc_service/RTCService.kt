@@ -142,7 +142,6 @@ class RTCService : Service(), NotificationCallback {
     }
 
     fun toggleAudioOutput() {
-        // todo toggle rtcAudioManager
         rtcAudioManager.setDefaultAudioDevice(
             if (!rtcState.currentState().isSpeakerMode) {
                 RTCAudioManager.AudioDevice.SPEAKER_PHONE
