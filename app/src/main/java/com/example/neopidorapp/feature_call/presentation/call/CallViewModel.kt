@@ -32,7 +32,7 @@ class CallViewModel @Inject constructor(
     //====================SCREEN STATE====================
     private val _callScreenState = MutableStateFlow(CallScreenState()) // todo must be mutable by Service state!
     val callScreenState: StateFlow<CallScreenState> = _callScreenState.asStateFlow()
-    fun updateState(state: CallScreenState) {
+    fun updateStateToDisplay(state: CallScreenState) {
         _callScreenState.value = state
     }
     fun updateIsIncomingCall(received: Boolean) { // todo update all these shit from service, not from fragment

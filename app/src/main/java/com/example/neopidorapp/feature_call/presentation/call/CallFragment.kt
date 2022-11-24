@@ -13,7 +13,6 @@ import com.example.neopidorapp.R
 import com.example.neopidorapp.databinding.FragmentCallBinding
 import com.example.neopidorapp.feature_call.presentation.rtc_service.RTCService
 import com.example.neopidorapp.feature_call.presentation.rtc_service.rtc_client.PeerConnectionObserver
-import com.example.neopidorapp.feature_call.presentation.rtc_service.rtc_client.RTCAudioManager
 import com.example.neopidorapp.models.IceCandidateModel
 import com.example.neopidorapp.models.MessageModel
 import com.google.gson.Gson
@@ -24,6 +23,8 @@ import org.webrtc.MediaStream
 import org.webrtc.SessionDescription
 
 private const val TAG = "CallFragment"
+private const val TAG_STATE_VM = "TAG_STATE_VM"
+private const val TAG_STATE_SERVICE = "TAG_STATE_SERVICE"
 
 @AndroidEntryPoint
 class CallFragment: Fragment(R.layout.fragment_call) {
@@ -58,6 +59,7 @@ class CallFragment: Fragment(R.layout.fragment_call) {
     private fun initObservers() {
         viewLifecycleOwner.lifecycleScope.launchWhenStarted {
             vm.callScreenState.collectLatest { state ->
+                Log.d(TAG_STATE_VM, "$state")
 
                 binding.apply {
 
@@ -224,8 +226,8 @@ class CallFragment: Fragment(R.layout.fragment_call) {
     private fun initRTCStateCollector() {
         viewLifecycleOwner.lifecycleScope.launchWhenStarted {
             rtcService?.rtcState?.state?.collectLatest {
-                Log.d(TAG, "new rtcState = $it")
-                vm.updateState(
+                Log.d(TAG_STATE_SERVICE, "$it")
+                vm.updateStateToDisplay(
                     CallScreenState(
                         it.isIncomingCall,
                         it.isOngoingCall,
