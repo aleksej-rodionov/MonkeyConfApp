@@ -38,7 +38,6 @@ class RTCService : Service(), NotificationCallback {
     //====================RTCCLIENT AND ITS NOTIFICATION====================
     val rtcState = RTCState()
 
-    // todo RTCClient with new parameters: state, notifCallback, coroutineScope
     val rtcClientWrapper = RTCClientWrapper(
         rtcState,
         this,

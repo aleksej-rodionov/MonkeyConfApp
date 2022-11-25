@@ -97,7 +97,7 @@ class CallFragment: Fragment(R.layout.fragment_call) {
 
         viewLifecycleOwner.lifecycleScope.launchWhenStarted {
             vm.incomingMessage.collectLatest { message ->
-                Log.d(TAG, "onNewMessage: $message")
+                Log.d(TAG, "onNewMessage: ${message.type}")
                 when (message.type) {
                     "call_response" -> {
                         if (message.data == "user is not online") {
@@ -108,11 +108,11 @@ class CallFragment: Fragment(R.layout.fragment_call) {
                             ).show()
                         } else {
                             //====================LAYOUT CONFIG====================
-                                vm.updateIsOngoingCall(true) // todo handle through Service.state!!
-//                            rtcService?.updateIsOngoingCall(true)
+//                                vm.updateIsOngoingCall(true) // todo handle through Service.state!!
+                            rtcService?.updateIsOngoingCall(true)
                             //====================LAYOUT CONFIG END====================
 
-                            binding.apply {
+                            binding.apply { // todo ERROR OCCURES SMWHERE IN THIS BLOCK
                                 rtcService?.initializeSurfaceView(localView)
                                 rtcService?.initializeSurfaceView(remoteView)
                                 rtcService?.startLocalVideo(localView)
@@ -127,8 +127,8 @@ class CallFragment: Fragment(R.layout.fragment_call) {
                     "offer_received" -> {
 
                         //====================LAYOUT CONFIG====================
-                            vm.updateIsIncomingCall(true) // todo handle through Service.state!!
-//                        rtcService?.updateIsIncomingCall(true)
+//                            vm.updateIsIncomingCall(true) // todo handle through Service.state!!
+                        rtcService?.updateIsIncomingCall(true)
                         //====================LAYOUT CONFIG END====================
 
                         binding.apply {
@@ -139,10 +139,10 @@ class CallFragment: Fragment(R.layout.fragment_call) {
                                 setIncomingCallLayoutGone() // todo handle through Service.state
                                 setCallLayoutVisible()  // todo handle through Service.state
                                 setWhoToCallLayoutGone()  // todo handle through Service.state
-                                vm.updateIsIncomingCall(false) // todo handle through Service.state!!
-                                vm.updateIsOngoingCall(true) // todo handle through Service.state!!
-//                                rtcService?.updateIsIncomingCall(false)
-//                                rtcService?.updateIsOngoingCall(true)
+//                                vm.updateIsIncomingCall(false) // todo handle through Service.state!!
+//                                vm.updateIsOngoingCall(true) // todo handle through Service.state!!
+                                rtcService?.updateIsIncomingCall(false)
+                                rtcService?.updateIsOngoingCall(true)
                                 //====================LAYOUT CONFIG END====================
 
                                 rtcService?.initializeSurfaceView(localView)
@@ -160,8 +160,8 @@ class CallFragment: Fragment(R.layout.fragment_call) {
 
                                 //====================LAYOUT CONFIG====================
                                 setIncomingCallLayoutGone() // todo handle through Service.state
-                                vm.updateIsIncomingCall(false) // todo handle through Service.state!!
-//                                rtcService?.updateIsIncomingCall(false)
+//                                vm.updateIsIncomingCall(false) // todo handle through Service.state!!
+                                rtcService?.updateIsIncomingCall(false)
                                 //====================LAYOUT CONFIG END====================
 
                             }
@@ -231,37 +231,37 @@ class CallFragment: Fragment(R.layout.fragment_call) {
                     )
                 )
 
-               /* binding.apply {
-
-                    //====================LAYOUT CONFIG====================
-                    if (state.isIncomingCall && !state.isOngoingCall) {
-                        setIncomingCallLayoutVisible()
-                        setCallLayoutGone()
-                        setWhoToCallLayoutGone()
-                    } else if (!state.isIncomingCall && state.isOngoingCall) {
-                        setIncomingCallLayoutGone()
-                        setCallLayoutVisible()
-                        setWhoToCallLayoutGone()
-                    } else if (state.isIncomingCall && state.isOngoingCall) {
-                        setIncomingCallLayoutVisible()
-                        setCallLayoutVisible()
-                        setWhoToCallLayoutGone()
-                    } else if (!state.isIncomingCall && !state.isOngoingCall) {
-                        setIncomingCallLayoutGone()
-                        setCallLayoutGone()
-                        setWhoToCallLayoutVisible()
-                    }
-                    //====================LAYOUT CONFIG END====================
-
-                    micButton.setImageResource(if (state.isMute) R.drawable.ic_baseline_mic_24
-                    else R.drawable.ic_baseline_mic_off_24)
-
-                    videoButton.setImageResource(if (state.isCameraPaused) R.drawable.ic_baseline_videocam_off_24
-                    else R.drawable.ic_baseline_videocam_24)
-
-                    audioOutputButton.setImageResource(if (state.isSpeakerMode) R.drawable.ic_baseline_cameraswitch_24
-                    else R.drawable.ic_baseline_hearing_24)
-                }*/
+//                binding.apply {
+//
+//                    //====================LAYOUT CONFIG====================
+//                    if (state.isIncomingCall && !state.isOngoingCall) {
+//                        setIncomingCallLayoutVisible()
+//                        setCallLayoutGone()
+//                        setWhoToCallLayoutGone()
+//                    } else if (!state.isIncomingCall && state.isOngoingCall) {
+//                        setIncomingCallLayoutGone()
+//                        setCallLayoutVisible()
+//                        setWhoToCallLayoutGone()
+//                    } else if (state.isIncomingCall && state.isOngoingCall) {
+//                        setIncomingCallLayoutVisible()
+//                        setCallLayoutVisible()
+//                        setWhoToCallLayoutGone()
+//                    } else if (!state.isIncomingCall && !state.isOngoingCall) {
+//                        setIncomingCallLayoutGone()
+//                        setCallLayoutGone()
+//                        setWhoToCallLayoutVisible()
+//                    }
+//                    //====================LAYOUT CONFIG END====================
+//
+//                    micButton.setImageResource(if (state.isMute) R.drawable.ic_baseline_mic_24
+//                    else R.drawable.ic_baseline_mic_off_24)
+//
+//                    videoButton.setImageResource(if (state.isCameraPaused) R.drawable.ic_baseline_videocam_off_24
+//                    else R.drawable.ic_baseline_videocam_24)
+//
+//                    audioOutputButton.setImageResource(if (state.isSpeakerMode) R.drawable.ic_baseline_cameraswitch_24
+//                    else R.drawable.ic_baseline_hearing_24)
+//                }
             }
         }
     }

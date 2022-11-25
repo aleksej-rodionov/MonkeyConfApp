@@ -4,6 +4,7 @@ import android.app.Application
 import android.util.Log
 import com.example.neopidorapp.feature_call.presentation.call.socket.SocketRepo
 import com.example.neopidorapp.models.MessageModel
+import com.example.neopidorapp.util.Constants.TAG_DEBUG
 import org.webrtc.*
 
 private const val TAG = "RTCClient"
@@ -114,10 +115,12 @@ class RTCClient(
                             override fun onCreateSuccess(p0: SessionDescription?) {}
 
                             override fun onSetSuccess() {
+                                Log.d(TAG_DEBUG, "desc = $desc")
                                 val offer = hashMapOf(
                                     "sdp" to desc?.description,
                                     "type" to desc?.type
                                 )
+                                Log.d(TAG_DEBUG, "offer = $offer")
                                 socketRepo.sendMessageToSocket(
                                     MessageModel("create_offer", username, targetName, offer)
                                 )
