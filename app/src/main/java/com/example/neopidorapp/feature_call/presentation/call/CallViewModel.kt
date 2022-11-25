@@ -5,13 +5,16 @@ import android.content.ServiceConnection
 import android.os.IBinder
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.neopidorapp.feature_call.presentation.call.socket.SocketRepo
 import com.example.neopidorapp.feature_call.presentation.rtc_service.RTCService
 import com.example.neopidorapp.models.MessageModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -65,7 +68,7 @@ class CallViewModel @Inject constructor(
     // somewhere here must be methods updating view state,
     // triggered by shit emited from RTCService.RTCClient.state
 
-    fun onCallButtonClick() {
+    fun onCallButtonClick()/* = viewModelScope.launch*/ {
         socketRepo.sendMessageToSocket(
             MessageModel(
                 "start_call",

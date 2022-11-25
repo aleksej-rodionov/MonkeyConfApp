@@ -15,6 +15,9 @@ import com.example.neopidorapp.feature_call.presentation.rtc_service.RTCService
 import com.example.neopidorapp.feature_call.presentation.rtc_service.rtc_client.PeerConnectionObserver
 import com.example.neopidorapp.models.IceCandidateModel
 import com.example.neopidorapp.models.MessageModel
+import com.example.neopidorapp.util.Constants.TAG_DEBUG
+import com.example.neopidorapp.util.currentThreadName
+import com.example.neopidorapp.util.isCurrentThreadMain
 import com.google.gson.Gson
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
@@ -121,6 +124,7 @@ class CallFragment: Fragment(R.layout.fragment_call) {
                                     vm.username!!,
                                     vm.socketRepo
                                 )
+                                Log.d(TAG_DEBUG, "AFTER .call() EXECUTED mainThread = ${isCurrentThreadMain()}, threadName = ${currentThreadName()}")
                             }
                         }
                     }
@@ -277,6 +281,14 @@ class CallFragment: Fragment(R.layout.fragment_call) {
 
             callBtn.setOnClickListener {
                 vm.onCallButtonClick()
+//                vm.socketRepo?.sendMessageToSocket(
+//                    MessageModel(
+//                        "start_call",
+//                        vm.username,
+//                        vm.targetName,
+//                        null
+//                    )
+//                )
             }
 
 

@@ -5,13 +5,15 @@ import android.util.Log
 import com.example.neopidorapp.feature_call.presentation.call.socket.SocketRepo
 import com.example.neopidorapp.models.MessageModel
 import com.example.neopidorapp.util.Constants.TAG_DEBUG
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import org.webrtc.*
 
 private const val TAG = "RTCClient"
 
 class RTCClient(
     private val application: Application?,
-    private val observer: PeerConnection.Observer
+    private val observer: PeerConnection.Observer,
     // This Observer object above will notify whenever there is an ICE Candidate.
     /**
      * (In previous video we've learned how to create an Offer or an Answer
@@ -19,6 +21,7 @@ class RTCClient(
      * But in this video we are going to learn how to exchange the ICE Candidates.
      * So, whenever a local SessionDescription is set, there will be some ICE Candidate.)
      */
+//    private val scope: CoroutineScope
 ) {
 
     private val eglContext = EglBase.create()
@@ -97,6 +100,7 @@ class RTCClient(
     }
 
     fun call(targetName: String, username: String, socketRepo: SocketRepo) {
+        Log.d(TAG_DEBUG, "call: CALLED")
 
         val mediaConstraints = MediaConstraints()
         mediaConstraints.mandatory.add(MediaConstraints.KeyValuePair("OfferToReceiveVideo", "true"))
@@ -115,12 +119,12 @@ class RTCClient(
                             override fun onCreateSuccess(p0: SessionDescription?) {}
 
                             override fun onSetSuccess() {
-                                Log.d(TAG_DEBUG, "desc = $desc")
+//                                Log.d(TAG_DEBUG, "desc = $desc")
                                 val offer = hashMapOf(
                                     "sdp" to desc?.description,
                                     "type" to desc?.type
                                 )
-                                Log.d(TAG_DEBUG, "offer = $offer")
+//                                Log.d(TAG_DEBUG, "offer = $offer")
                                 socketRepo.sendMessageToSocket(
                                     MessageModel("create_offer", username, targetName, offer)
                                 )
@@ -131,6 +135,7 @@ class RTCClient(
                         },
                         desc
                     )
+
                 }
 
                 override fun onSetSuccess() {}

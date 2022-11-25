@@ -21,7 +21,7 @@ class RTCClientWrapper(
 
     //====================RTC WRAPPER METHODS====================
     override fun initRtcClient(application: Application, observer: PeerConnectionObserver) {
-        rtcClient = RTCClient(application, observer)
+        rtcClient = RTCClient(application, observer/*, scope*/)
     }
 
     override fun initializeSurfaceView(surface: SurfaceViewRenderer) {

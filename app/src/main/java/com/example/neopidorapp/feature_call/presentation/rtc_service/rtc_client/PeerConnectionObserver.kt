@@ -52,4 +52,8 @@ open class PeerConnectionObserver : PeerConnection.Observer {
     override fun onAddTrack(p0: RtpReceiver?, p1: Array<out MediaStream>?) {
         // empty
     }
+
+//    override fun onTrack(transceiver: RtpTransceiver?) {
+//        // empty
+//    }
 }

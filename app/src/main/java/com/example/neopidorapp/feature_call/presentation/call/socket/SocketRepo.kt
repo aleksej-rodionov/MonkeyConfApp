@@ -2,9 +2,13 @@ package com.example.neopidorapp.feature_call.presentation.call.socket
 
 import android.util.Log
 import com.example.neopidorapp.models.MessageModel
+import com.example.neopidorapp.util.Constants.TAG_DEBUG
 import com.example.neopidorapp.util.NewMessageInterface
+import com.example.neopidorapp.util.currentThreadName
+import com.example.neopidorapp.util.isCurrentThreadMain
 import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -23,7 +27,7 @@ class SocketRepo(
     private val _incomingMessage: MutableSharedFlow<MessageModel> = MutableSharedFlow()
     val incomingMessage: SharedFlow<MessageModel> = _incomingMessage.asSharedFlow()
     private fun emitNewMessage(message: MessageModel) = scope.launch {
-        Log.d(TAG, "emitNewMessage: $message")
+        Log.d(TAG_DEBUG, "emitNewMessage: $message")
         _incomingMessage.emit(message)
     }
 
@@ -79,12 +83,13 @@ class SocketRepo(
         webSocket?.connect() // here we connect our client to our webSocket
     }
 
-    fun sendMessageToSocket(message: MessageModel) {
+    fun sendMessageToSocket(message: MessageModel)/* = scope.launch(Dispatchers.IO)*/ {
         try {
-            Log.d(TAG, "sendMessageToSocket: try = call")
             webSocket?.send(Gson().toJson(message))
+            Log.d(TAG_DEBUG, "sendMessageToSocket: \nmainThread = ${isCurrentThreadMain()}, \nthreadName = ${currentThreadName()}")
+            Log.d(TAG_DEBUG, "sendMessageToSocket: message = $message")
         } catch (e: Exception) {
-            Log.d(TAG, "sendMessageToSocket: e = ${e.localizedMessage}")
+            Log.d(TAG_DEBUG, "sendMessageToSocket: e = ${e.localizedMessage}")
             e.printStackTrace()
         }
     }
