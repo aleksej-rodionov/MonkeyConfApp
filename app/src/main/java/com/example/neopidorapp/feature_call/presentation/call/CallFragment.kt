@@ -231,7 +231,7 @@ class CallFragment: Fragment(R.layout.fragment_call) {
                     )
                 )
 
-                binding.apply {
+               /* binding.apply {
 
                     //====================LAYOUT CONFIG====================
                     if (state.isIncomingCall && !state.isOngoingCall) {
@@ -261,7 +261,7 @@ class CallFragment: Fragment(R.layout.fragment_call) {
 
                     audioOutputButton.setImageResource(if (state.isSpeakerMode) R.drawable.ic_baseline_cameraswitch_24
                     else R.drawable.ic_baseline_hearing_24)
-                }
+                }*/
             }
         }
     }
