@@ -6,28 +6,28 @@ import androidx.core.app.NotificationCompat
 import com.example.neopidorapp.MainActivity
 import com.example.neopidorapp.NeoPidorApp
 import com.example.neopidorapp.R
-import com.example.neopidorapp.feature_call.presentation.rtc_service.RTCService
+import com.example.neopidorapp.feature_call.presentation.rtc_service.CallService
 import com.example.neopidorapp.feature_call.presentation.rtc_service.rtc_ui_state.RTCUiState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
-class RTCNotification(
+class CallServiceNotification(
     private val scope: CoroutineScope,
-    private val rtcService: RTCService
+    private val callService: CallService
 ): NotificationControl {
 
     private var rtcNotificationJob: Job? = null
 
     override fun launchNotificationJob() {
         rtcNotificationJob = scope.launch {
-            rtcService.rtcState.state.collectLatest { state ->
+            callService.rtcState.state.collectLatest { state ->
                 if (state.isOngoingCall) {
                     showRtcNotification(state)
                 } else {
                     stopNotificationJob()
-                    rtcService.stopForeground(true)
+                    callService.stopForeground(true)
                 }
             }
         }
@@ -39,18 +39,18 @@ class RTCNotification(
 
     override fun showRtcNotification(state: RTCUiState) {
 
-        val activityIntent = Intent(rtcService, MainActivity::class.java)
+        val activityIntent = Intent(callService, MainActivity::class.java)
         val activityPendingIntent = PendingIntent.getActivity(
-            rtcService, 1, activityIntent,
+            callService, 1, activityIntent,
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
 
-        val endCallIntent = Intent(rtcService, RTCNotificationReceiver::class.java)
+        val endCallIntent = Intent(callService, RTCNotificationReceiver::class.java)
         endCallIntent.action = RTCNotificationReceiver.ACTION_END_CALL
         val endCallPendingIntent = PendingIntent.getBroadcast(
-            rtcService, 1, endCallIntent,
+            callService, 1, endCallIntent,
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
 
-        val notificationBuilder = NotificationCompat.Builder(rtcService, NeoPidorApp.RTC_NOTIFICATION_CHANNEL_ID)
+        val notificationBuilder = NotificationCompat.Builder(callService, NeoPidorApp.RTC_NOTIFICATION_CHANNEL_ID)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             .setSmallIcon(R.drawable.ic_accept)
 
@@ -69,6 +69,6 @@ class RTCNotification(
             .setContentText(".. is in process") // for audioComments
             .build()
 
-        rtcService.startForeground(1, notification)
+        callService.startForeground(1, notification)
     }
 }

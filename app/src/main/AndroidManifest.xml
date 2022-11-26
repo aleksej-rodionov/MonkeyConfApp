@@ -33,7 +33,7 @@
 <!--            android:exported="true">-->
 <!--        </activity>-->
 
-        <service android:name=".feature_call.presentation.rtc_service.RTCService" />
+        <service android:name=".feature_call.presentation.rtc_service.CallService" />
 
         <receiver android:name=".feature_call.presentation.rtc_service.notification.RTCNotificationReceiver" />
 

@@ -5,32 +5,29 @@ import android.content.ServiceConnection
 import android.os.IBinder
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import com.example.neopidorapp.feature_call.presentation.call.socket.SocketRepo
-import com.example.neopidorapp.feature_call.presentation.rtc_service.RTCService
-import com.example.neopidorapp.models.MessageModel
+import com.example.neopidorapp.feature_call.presentation.rtc_service.CallService
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class CallViewModel @Inject constructor(
-    val socketRepo: SocketRepo,
+//    val socketRepo: SocketRepo,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
+    // todo MOVE THIS TO SERVICE!!!!!
     var username = savedStateHandle.get<String>("username")
 
-    var targetName: String? = null
+    // todo MOVE THIS TO SERVICE!!!!!
+    var targetName: String = ""
     fun updateTargetName(name: String) {
         targetName = name
     }
 
-    val incomingMessage = socketRepo.incomingMessage
+//    val incomingMessage = socketRepo.incomingMessage
 
     //====================SCREEN STATE====================
     private val _callScreenState = MutableStateFlow(CallScreenState()) // todo must be mutable by Service state!
@@ -38,37 +35,34 @@ class CallViewModel @Inject constructor(
     fun updateStateToDisplay(state: CallScreenState) {
         _callScreenState.value = state
     }
-    fun updateIsIncomingCall(received: Boolean) { // todo update all these shit from service, not from fragment
-        _callScreenState.value = callScreenState.value.copy(isIncomingCall = received)
-    }
-    fun updateIsOngoingCall(callRunning: Boolean) { // todo update all these shit from service, not from fragment
-        _callScreenState.value = callScreenState.value.copy(isOngoingCall = callRunning)
-    }
-    fun updateIsMute(mute: Boolean) { // todo update all these shit from service, not from fragment
-        _callScreenState.value = callScreenState.value.copy(isMute = mute)
-    }
-    fun updateIsCameraPaused(mute: Boolean) { // todo update all these shit from service, not from fragment
-        _callScreenState.value = callScreenState.value.copy(isCameraPaused = mute)
-    }
-    fun updateIsSpeakerMode(mute: Boolean) { // todo update all these shit from service, not from fragment
-        _callScreenState.value = callScreenState.value.copy(isSpeakerMode = mute)
-    }
+//    fun updateIsIncomingCall(received: Boolean) { // todo update all these shit from service, not from fragment
+//        _callScreenState.value = callScreenState.value.copy(isIncomingCall = received)
+//    }
+//    fun updateIsOngoingCall(callRunning: Boolean) { // todo update all these shit from service, not from fragment
+//        _callScreenState.value = callScreenState.value.copy(isOngoingCall = callRunning)
+//    }
+//    fun updateIsMute(mute: Boolean) { // todo update all these shit from service, not from fragment
+//        _callScreenState.value = callScreenState.value.copy(isMute = mute)
+//    }
+//    fun updateIsCameraPaused(mute: Boolean) { // todo update all these shit from service, not from fragment
+//        _callScreenState.value = callScreenState.value.copy(isCameraPaused = mute)
+//    }
+//    fun updateIsSpeakerMode(mute: Boolean) { // todo update all these shit from service, not from fragment
+//        _callScreenState.value = callScreenState.value.copy(isSpeakerMode = mute)
+//    }
     //====================SCREEN STATE END====================
 
 
 
     //===========================METHODS==============================
-    fun initSocket() {
+    /*fun initSocket() {
         username?.let { u ->
             socketRepo.initSocket(u)
         }
     }
-
+*/
     //===================LISTENER METHODS======================
-    // somewhere here must be methods updating view state,
-    // triggered by shit emited from RTCService.RTCClient.state
-
-    fun onCallButtonClick()/* = viewModelScope.launch*/ {
+    /*fun onCallButtonClick()*//* = viewModelScope.launch*//* {
         socketRepo.sendMessageToSocket(
             MessageModel(
                 "start_call",
@@ -77,26 +71,26 @@ class CallViewModel @Inject constructor(
                 null
             )
         )
-    }
+    }*/
 
     //====================RTC SERVICE CONNECTION====================
-    private val _rtcBinderState = MutableStateFlow<RTCService.RTCBinder?>(null)
-    val rtcBinderState: StateFlow<RTCService.RTCBinder?> = _rtcBinderState.asStateFlow()
+    private val _callServiceBinderState = MutableStateFlow<CallService.CallServiceBinder?>(null)
+    val callServiceBinderState: StateFlow<CallService.CallServiceBinder?> = _callServiceBinderState.asStateFlow()
 
-    private val rtcServiceConnection = object : ServiceConnection {
+    private val callrtcServiceConnection = object : ServiceConnection {
         override fun onServiceConnected(service: ComponentName?, binder: IBinder?) {
             binder?.let {
-                val rtcBinder = it as RTCService.RTCBinder
-                _rtcBinderState.value = rtcBinder
+                val callServiceBinder = it as CallService.CallServiceBinder
+                _callServiceBinderState.value = callServiceBinder
             }
         }
 
         override fun onServiceDisconnected(service: ComponentName?) {
-            _rtcBinderState.value = null
+            _callServiceBinderState.value = null
         }
     }
 
-    fun getRTCServiceConnection() = rtcServiceConnection
+    fun getCallServiceConnection() = callrtcServiceConnection
     //====================RTC SERVICE CONNECTION END====================
 }
 
@@ -105,5 +99,7 @@ data class CallScreenState(
     val isOngoingCall: Boolean = false,
     val isMute: Boolean = false,
     val isCameraPaused: Boolean = false,
-    val isSpeakerMode: Boolean = false
+    val isSpeakerMode: Boolean = false,
+    val remoteViewLoadingVisible: Boolean = true,
+    val incomingCallSenderName: String? = null
 )

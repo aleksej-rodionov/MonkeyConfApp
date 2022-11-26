@@ -30,4 +30,16 @@ class RTCState: RTCUiStateControl {
     override fun updateIsSpeakerMode(speakerMode: Boolean) {
         _state.value = state.value.copy(isSpeakerMode = speakerMode)
     }
+
+    override fun updateRemoteViewLoading(loading: Boolean) {
+        _state.value = state.value.copy(remoteViewLoadingVisible = loading)
+    }
+
+    override fun updateIncomingCallSenderName(name: String?) {
+        _state.value = state.value.copy(incomingCallSenderName = name)
+    }
+
+    override fun updateIncomingOfferMessageData(data: Any?) {
+        _state.value = state.value.copy(incomingOfferMessageData = data)
+    }
 }

@@ -1,14 +1,12 @@
-package com.example.neopidorapp.feature_call.presentation.call.socket
+package com.example.neopidorapp.feature_call.data
 
 import android.util.Log
 import com.example.neopidorapp.models.MessageModel
 import com.example.neopidorapp.util.Constants.TAG_DEBUG
-import com.example.neopidorapp.util.NewMessageInterface
 import com.example.neopidorapp.util.currentThreadName
 import com.example.neopidorapp.util.isCurrentThreadMain
 import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -22,7 +20,6 @@ private const val TAG = "SocketRepo"
 
 class SocketRepo(
     private val scope: CoroutineScope
-//    private val newMessageInterface: NewMessageInterface
 ) {
     private val _incomingMessage: MutableSharedFlow<MessageModel> = MutableSharedFlow()
     val incomingMessage: SharedFlow<MessageModel> = _incomingMessage.asSharedFlow()

@@ -11,13 +11,16 @@ import androidx.lifecycle.lifecycleScope
 import com.example.neopidorapp.MainActivity
 import com.example.neopidorapp.R
 import com.example.neopidorapp.databinding.FragmentCallBinding
-import com.example.neopidorapp.feature_call.presentation.rtc_service.RTCService
+import com.example.neopidorapp.feature_call.presentation.rtc_service.CallService
+import com.example.neopidorapp.feature_call.presentation.rtc_service.CallServiceEvent
 import com.example.neopidorapp.feature_call.presentation.rtc_service.rtc_client.PeerConnectionObserver
 import com.example.neopidorapp.models.IceCandidateModel
 import com.example.neopidorapp.models.MessageModel
 import com.example.neopidorapp.util.Constants.TAG_DEBUG
+import com.example.neopidorapp.util.Constants.TAG_PEER_CONNECTION
 import com.example.neopidorapp.util.currentThreadName
 import com.example.neopidorapp.util.isCurrentThreadMain
+import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
@@ -32,7 +35,7 @@ private const val TAG_STATE_SERVICE = "TAG_STATE_SERVICE"
 @AndroidEntryPoint
 class CallFragment: Fragment(R.layout.fragment_call) {
 
-    private var rtcService: RTCService? = null
+    private var callService: CallService? = null
     private var peerConnectionObserver: PeerConnectionObserver? = null
 
     private val vm: CallViewModel by viewModels()
@@ -52,9 +55,8 @@ class CallFragment: Fragment(R.layout.fragment_call) {
         initObservers()
         initListeners()
 
-        vm.initSocket()
-
         // todo where to call it? in onViewCreated() or rtcBinderState.collectLatest {} ??
+//        callService?.initSocket()
 //        initPeerConnectionObserver()
 //        initRtcClient()
     }
@@ -86,6 +88,14 @@ class CallFragment: Fragment(R.layout.fragment_call) {
                     }
                     //====================LAYOUT CONFIG END====================
 
+                    if (state.remoteViewLoadingVisible) {
+                        remoteViewLoading.visibility = View.VISIBLE
+                    } else {
+                        remoteViewLoading.visibility = View.GONE
+                    }
+
+                    incomingNameTV.text = "${state.incomingCallSenderName} is calling you"
+
                     micButton.setImageResource(if (state.isMute) R.drawable.ic_baseline_mic_24
                     else R.drawable.ic_baseline_mic_off_24)
 
@@ -99,123 +109,20 @@ class CallFragment: Fragment(R.layout.fragment_call) {
         }
 
         viewLifecycleOwner.lifecycleScope.launchWhenStarted {
-            vm.incomingMessage.collectLatest { message ->
-                Log.d(TAG, "onNewMessage: ${message.type}")
-                when (message.type) {
-                    "call_response" -> {
-                        if (message.data == "user is not online") {
-                            Toast.makeText( // todo handle through Service.state
-                                requireContext(),
-                                "user is not online",
-                                Toast.LENGTH_LONG
-                            ).show()
-                        } else {
-                            //====================LAYOUT CONFIG====================
-//                                vm.updateIsOngoingCall(true) // todo handle through Service.state!!
-                            rtcService?.updateIsOngoingCall(true)
-                            //====================LAYOUT CONFIG END====================
-
-                            binding.apply { // todo ERROR OCCURES SMWHERE IN THIS BLOCK
-                                rtcService?.initializeSurfaceView(localView)
-                                rtcService?.initializeSurfaceView(remoteView)
-                                rtcService?.startLocalVideo(localView)
-                                rtcService?.call(
-                                    targetUserNameEt.text.toString(),
-                                    vm.username!!,
-                                    vm.socketRepo
-                                )
-                                Log.d(TAG_DEBUG, "AFTER .call() EXECUTED mainThread = ${isCurrentThreadMain()}, threadName = ${currentThreadName()}")
-                            }
-                        }
-                    }
-                    "offer_received" -> {
-
-                        //====================LAYOUT CONFIG====================
-//                            vm.updateIsIncomingCall(true) // todo handle through Service.state!!
-                        rtcService?.updateIsIncomingCall(true)
-                        //====================LAYOUT CONFIG END====================
-
-                        binding.apply {
-                            incomingNameTV.text = "${message.name.toString()} is calling you"
-                            acceptButton.setOnClickListener { // todo handle through Service.state
-
-                                //====================LAYOUT CONFIG====================
-                                setIncomingCallLayoutGone() // todo handle through Service.state
-                                setCallLayoutVisible()  // todo handle through Service.state
-                                setWhoToCallLayoutGone()  // todo handle through Service.state
-//                                vm.updateIsIncomingCall(false) // todo handle through Service.state!!
-//                                vm.updateIsOngoingCall(true) // todo handle through Service.state!!
-                                rtcService?.updateIsIncomingCall(false)
-                                rtcService?.updateIsOngoingCall(true)
-                                //====================LAYOUT CONFIG END====================
-
-                                rtcService?.initializeSurfaceView(localView)
-                                rtcService?.initializeSurfaceView(remoteView)
-                                rtcService?.startLocalVideo(localView)
-                                val remoteSession = SessionDescription(
-                                    SessionDescription.Type.OFFER,
-                                    message.data.toString()
-                                )
-                                rtcService?.onRemoteSessionReceived(remoteSession)
-                                rtcService?.answer(message.name!!, vm.username!!, vm.socketRepo)
-                                vm.updateTargetName(message.name!!) // todo handle through Service.state
-                            }
-                            rejectButton.setOnClickListener {
-
-                                //====================LAYOUT CONFIG====================
-                                setIncomingCallLayoutGone() // todo handle through Service.state
-//                                vm.updateIsIncomingCall(false) // todo handle through Service.state!!
-                                rtcService?.updateIsIncomingCall(false)
-                                //====================LAYOUT CONFIG END====================
-
-                            }
-                            remoteViewLoading.visibility = View.GONE
-                        }
-                    }
-                    "answer_received" -> {
-                        val session = SessionDescription(
-                            SessionDescription.Type.ANSWER,
-                            message.data.toString()
-                        )
-                        rtcService?.onRemoteSessionReceived(session)
-                        binding.remoteViewLoading.visibility = View.GONE
-                    }
-                    "ice_candidate" -> {
-                        // RECEIVING ICE CANDIDATE:
-                        try {
-                            val receivedIceCandidate = gson.fromJson(
-                                gson.toJson(message.data),
-                                IceCandidateModel::class.java
-                            )
-                            rtcService?.addIceCandidate(
-                                IceCandidate(
-                                    receivedIceCandidate.sdpMid,
-                                    Math.toIntExact(receivedIceCandidate.sdpMLineIndex.toLong()),
-                                    receivedIceCandidate.sdpCandidate
-                                )
-                            )
-                        } catch (e: Exception) {
-                            e.printStackTrace()
-                        }
-                    }
-                }
-            }
-        }
-
-
-
-        viewLifecycleOwner.lifecycleScope.launchWhenStarted {
-            vm.rtcBinderState.collectLatest {
+            vm.callServiceBinderState.collectLatest {
                 if (it != null) {
-                    rtcService = it.service
+                    callService = it.service
+                    callService?.initUsername(vm.username)
+                    callService?.initSocket(vm.username)
                     initPeerConnectionObserver()
-                    rtcService?.initRtcClient(
+                    callService?.initRtcClient(
                         (activity as MainActivity).application,
                         peerConnectionObserver!!
                     )
                     initRTCStateCollector()
+                    initCallServiceEventCollector()
                 } else {
-                    rtcService = null
+                    callService = null
                 }
             }
         }
@@ -223,7 +130,7 @@ class CallFragment: Fragment(R.layout.fragment_call) {
 
     private fun initRTCStateCollector() {
         viewLifecycleOwner.lifecycleScope.launchWhenStarted {
-            rtcService?.rtcState?.state?.collectLatest { state ->
+            callService?.rtcState?.state?.collectLatest { state ->
                 Log.d(TAG_STATE_SERVICE, "$state")
                 vm.updateStateToDisplay(
                     CallScreenState(
@@ -231,41 +138,38 @@ class CallFragment: Fragment(R.layout.fragment_call) {
                         state.isOngoingCall,
                         state.isMute,
                         state.isCameraPaused,
-                        state.isSpeakerMode
+                        state.isSpeakerMode,
+                        state.remoteViewLoadingVisible,
+                        state.incomingCallSenderName
                     )
                 )
+            }
+        }
+    }
 
-//                binding.apply {
-//
-//                    //====================LAYOUT CONFIG====================
-//                    if (state.isIncomingCall && !state.isOngoingCall) {
-//                        setIncomingCallLayoutVisible()
-//                        setCallLayoutGone()
-//                        setWhoToCallLayoutGone()
-//                    } else if (!state.isIncomingCall && state.isOngoingCall) {
-//                        setIncomingCallLayoutGone()
-//                        setCallLayoutVisible()
-//                        setWhoToCallLayoutGone()
-//                    } else if (state.isIncomingCall && state.isOngoingCall) {
-//                        setIncomingCallLayoutVisible()
-//                        setCallLayoutVisible()
-//                        setWhoToCallLayoutGone()
-//                    } else if (!state.isIncomingCall && !state.isOngoingCall) {
-//                        setIncomingCallLayoutGone()
-//                        setCallLayoutGone()
-//                        setWhoToCallLayoutVisible()
-//                    }
-//                    //====================LAYOUT CONFIG END====================
-//
-//                    micButton.setImageResource(if (state.isMute) R.drawable.ic_baseline_mic_24
-//                    else R.drawable.ic_baseline_mic_off_24)
-//
-//                    videoButton.setImageResource(if (state.isCameraPaused) R.drawable.ic_baseline_videocam_off_24
-//                    else R.drawable.ic_baseline_videocam_24)
-//
-//                    audioOutputButton.setImageResource(if (state.isSpeakerMode) R.drawable.ic_baseline_cameraswitch_24
-//                    else R.drawable.ic_baseline_hearing_24)
-//                }
+    private fun initCallServiceEventCollector() {
+        viewLifecycleOwner.lifecycleScope.launchWhenStarted {
+            callService?.callServiceEvent?.collectLatest { event ->
+                when (event) {
+                    is CallServiceEvent.SnackbarMessage -> {
+                        Snackbar.make(
+                            binding.root,
+                            "user is not online",
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
+                    is CallServiceEvent.TargetIsOnlineAndReadyToReceiveACall -> {
+                        callService?.initializeSurfaceViewsAndStartLocalVideo(
+                            binding.localView,
+                            binding.remoteView
+                        )
+                        callService?.callAfterInitializingSurfaceViews()
+                    }
+                    is CallServiceEvent.CallOfferReceived -> {
+                        setAcceptClickListener()
+                        setRejectClickListener()
+                    }
+                }
             }
         }
     }
@@ -275,43 +179,36 @@ class CallFragment: Fragment(R.layout.fragment_call) {
 
             targetUserNameEt.addTextChangedListener {
                 vm.updateTargetName(it.toString())
+                callService?.updateTargetName(it.toString())
             }
 
 
 
             callBtn.setOnClickListener {
-                vm.onCallButtonClick()
-//                vm.socketRepo?.sendMessageToSocket(
-//                    MessageModel(
-//                        "start_call",
-//                        vm.username,
-//                        vm.targetName,
-//                        null
-//                    )
-//                )
+                callService?.onCallButtonClick(vm.username, vm.targetName)
             }
 
 
 
             //====================RTC VIEW CONTROL BUTTONS====================
             switchCameraButton.setOnClickListener {
-                rtcService?.switchCamera()
+                callService?.switchCamera()
             }
 
             micButton.setOnClickListener {
-                rtcService?.toggleAudio(!vm.callScreenState.value.isMute)
+                callService?.toggleAudio(!vm.callScreenState.value.isMute)
             }
 
             videoButton.setOnClickListener {
-                rtcService?.toggleCamera(!vm.callScreenState.value.isCameraPaused) // todo combine in Service
+                callService?.toggleCamera(!vm.callScreenState.value.isCameraPaused) // todo combine in Service
             }
 
             audioOutputButton.setOnClickListener {
-                rtcService?.toggleAudioOutput()
+                callService?.toggleAudioOutput()
             }
 
             endCallButton.setOnClickListener {
-                rtcService?.endCall()
+                callService?.endCall()
             }
             //====================RTC VIEW CONTROL BUTTONS END====================
         }
@@ -319,7 +216,7 @@ class CallFragment: Fragment(R.layout.fragment_call) {
 
     override fun onResume() {
         super.onResume()
-        (activity as MainActivity).bindRTCService(vm.getRTCServiceConnection())
+        (activity as MainActivity).bindRTCService(vm.getCallServiceConnection())
     }
 
     override fun onDestroyView() {
@@ -333,8 +230,10 @@ class CallFragment: Fragment(R.layout.fragment_call) {
     private fun initPeerConnectionObserver() {
         peerConnectionObserver = object : PeerConnectionObserver() {
             override fun onIceCandidate(p0: IceCandidate?) {
+                Log.d(TAG_PEER_CONNECTION, "onIceCandidate: ${p0.toString()}")
+
                 super.onIceCandidate(p0)
-                rtcService?.addIceCandidate(p0)
+                callService?.addIceCandidate(p0)
                 /**
                  * we add an ICE Candidate above...
                  * ... and it's time to send this ICE Candidate to our peer:
@@ -345,13 +244,15 @@ class CallFragment: Fragment(R.layout.fragment_call) {
                     "sdpMLineIndex" to p0?.sdpMLineIndex,
                     "sdpCandidate" to p0?.sdp
                 )
-                vm.socketRepo?.sendMessageToSocket(
+                callService?.sendMessageToSocket(
 //                        MessageModel("ice_candidate", username, vm.targetName, candidate)
                     MessageModel("ice_candidate", vm.username, vm.targetName, candidate)
                 )
             }
 
             override fun onAddStream(p0: MediaStream?) {
+                Log.d(TAG_PEER_CONNECTION, "onAddStream: ${p0.toString()}")
+
                 super.onAddStream(p0)
                 p0?.videoTracks?.get(0)?.addSink(binding.remoteView)
             }
@@ -382,6 +283,39 @@ class CallFragment: Fragment(R.layout.fragment_call) {
 
     private fun setCallLayoutVisible() {
         binding.callLayout.visibility = View.VISIBLE
+    }
+
+
+
+    private fun setAcceptClickListener() {
+        binding.acceptButton.setOnClickListener { // todo handle through Service.state
+//            setIncomingCallLayoutGone() // todo handle through Service.state
+//            setCallLayoutVisible()  // todo handle through Service.state
+//            setWhoToCallLayoutGone()  // todo handle through Service.state
+            callService?.updateIsIncomingCall(false)
+            callService?.updateIsOngoingCall(true)
+
+            binding.apply {
+                callService?.initializeSurfaceViewsAndStartLocalVideo(
+                    localView,
+                    remoteView
+                )
+            }
+
+            callService?.setReceivedSessionDescriptionToPeerConnection()
+
+            callService?.answerAfterInitViewsAndReceivingSession()
+        }
+    }
+    private fun setRejectClickListener() {
+        binding.rejectButton.setOnClickListener {
+
+            //====================LAYOUT CONFIG====================
+            setIncomingCallLayoutGone() // todo handle through Service.state
+            callService?.updateIsIncomingCall(false)
+            //====================LAYOUT CONFIG END====================
+
+        }
     }
     //====================PRIVATE METHODS END====================
 }

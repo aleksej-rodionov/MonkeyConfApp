@@ -2,11 +2,10 @@ package com.example.neopidorapp.feature_call.presentation.rtc_service.rtc_client
 
 import android.app.Application
 import android.util.Log
-import com.example.neopidorapp.feature_call.presentation.call.socket.SocketRepo
+import com.example.neopidorapp.feature_call.data.SocketRepo
 import com.example.neopidorapp.models.MessageModel
 import com.example.neopidorapp.util.Constants.TAG_DEBUG
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 import org.webrtc.*
 
 private const val TAG = "RTCClient"
@@ -14,6 +13,7 @@ private const val TAG = "RTCClient"
 class RTCClient(
     private val application: Application?,
     private val observer: PeerConnection.Observer,
+    private val socketRepo: SocketRepo,
     // This Observer object above will notify whenever there is an ICE Candidate.
     /**
      * (In previous video we've learned how to create an Offer or an Answer
@@ -21,7 +21,7 @@ class RTCClient(
      * But in this video we are going to learn how to exchange the ICE Candidates.
      * So, whenever a local SessionDescription is set, there will be some ICE Candidate.)
      */
-//    private val scope: CoroutineScope
+    private val scope: CoroutineScope
 ) {
 
     private val eglContext = EglBase.create()
@@ -96,7 +96,7 @@ class RTCClient(
         localStream.addTrack(localAudioTrack)
         localStream.addTrack(localVideoTrack)
 
-        peerConnection?.addStream(localStream)
+        peerConnection?.addStream(localStream) // peerConnectionAction
     }
 
     fun call(targetName: String, username: String, socketRepo: SocketRepo) {
@@ -105,7 +105,7 @@ class RTCClient(
         val mediaConstraints = MediaConstraints()
         mediaConstraints.mandatory.add(MediaConstraints.KeyValuePair("OfferToReceiveVideo", "true"))
 
-        peerConnection?.createOffer(
+        peerConnection?.createOffer( // peerConnectionAction
             object : SdpObserver {
                 /**
                  * todo learn about this SdpObserver and what it does
@@ -114,7 +114,7 @@ class RTCClient(
 
                 override fun onCreateSuccess(desc: SessionDescription?) {
                     // Whenever this Offer is created we also wand to add its Local Description to it.
-                    peerConnection?.setLocalDescription(
+                    peerConnection?.setLocalDescription( // peerConnectionAction
                         object : SdpObserver {
                             override fun onCreateSuccess(p0: SessionDescription?) {}
 
@@ -147,7 +147,7 @@ class RTCClient(
     }
 
     fun onRemoteSessionReceived(remoteSession: SessionDescription) {
-        peerConnection?.setRemoteDescription(
+        peerConnection?.setRemoteDescription( // peerConnectionAction
             object : SdpObserver {
                 override fun onCreateSuccess(p0: SessionDescription?) {}
                 override fun onSetSuccess() {}
@@ -162,7 +162,7 @@ class RTCClient(
         val mediaConstraints = MediaConstraints()
         mediaConstraints.mandatory.add(MediaConstraints.KeyValuePair("OfferToReceiveVideo", "true"))
 
-        peerConnection?.createAnswer(
+        peerConnection?.createAnswer( // peerConnectionAction
             object : SdpObserver {
                 override fun onCreateSuccess(desc: SessionDescription?) {
                     peerConnection?.setLocalDescription(object : SdpObserver {
@@ -192,7 +192,7 @@ class RTCClient(
     }
 
     fun addIceCandidate(p0: IceCandidate?) {
-        peerConnection?.addIceCandidate(p0)
+        peerConnection?.addIceCandidate(p0) // peerConnectionAction
     }
 
 

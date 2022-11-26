@@ -1,6 +1,6 @@
 package com.example.neopidorapp.feature_call.di
 
-import com.example.neopidorapp.feature_call.presentation.call.socket.SocketRepo
+import com.example.neopidorapp.feature_call.data.SocketRepo
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

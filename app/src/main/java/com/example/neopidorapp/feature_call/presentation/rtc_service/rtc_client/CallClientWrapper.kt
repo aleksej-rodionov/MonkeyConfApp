@@ -1,7 +1,7 @@
 package com.example.neopidorapp.feature_call.presentation.rtc_service.rtc_client
 
 import android.app.Application
-import com.example.neopidorapp.feature_call.presentation.call.socket.SocketRepo
+import com.example.neopidorapp.feature_call.data.SocketRepo
 import org.webrtc.IceCandidate
 import org.webrtc.SessionDescription
 import org.webrtc.SurfaceViewRenderer

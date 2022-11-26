@@ -13,6 +13,9 @@ interface RTCUiStateControl {
     fun updateIsMute(mute: Boolean)
     fun updateIsCameraPaused(cameraPaused: Boolean)
     fun updateIsSpeakerMode(speakerMode: Boolean)
+    fun updateRemoteViewLoading(loading: Boolean)
+    fun updateIncomingCallSenderName(name: String?)
+    fun updateIncomingOfferMessageData(data: Any?)
 }
 
 data class RTCUiState(
@@ -20,5 +23,8 @@ data class RTCUiState(
     val isOngoingCall: Boolean = false,
     val isMute: Boolean = false,
     val isCameraPaused: Boolean = false,
-    val isSpeakerMode: Boolean = false
+    val isSpeakerMode: Boolean = false,
+    val remoteViewLoadingVisible: Boolean = true,
+    val incomingCallSenderName: String? = null,
+    val incomingOfferMessageData: Any? = null
 )

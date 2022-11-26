@@ -1,7 +1,7 @@
 package com.example.neopidorapp.feature_call.presentation.rtc_service.rtc_client
 
 import android.app.Application
-import com.example.neopidorapp.feature_call.presentation.call.socket.SocketRepo
+import com.example.neopidorapp.feature_call.data.SocketRepo
 import com.example.neopidorapp.feature_call.presentation.rtc_service.notification.NotificationCallback
 import com.example.neopidorapp.feature_call.presentation.rtc_service.rtc_ui_state.RTCUiStateControl
 import kotlinx.coroutines.CoroutineScope
@@ -12,6 +12,7 @@ import org.webrtc.SurfaceViewRenderer
 class RTCClientWrapper(
     private val rtcUiStateControl: RTCUiStateControl,
     private val notificationCallback: NotificationCallback,
+    private val socketRepo: SocketRepo,
     private val scope: CoroutineScope
 ): CallClientWrapper {
 
@@ -21,7 +22,7 @@ class RTCClientWrapper(
 
     //====================RTC WRAPPER METHODS====================
     override fun initRtcClient(application: Application, observer: PeerConnectionObserver) {
-        rtcClient = RTCClient(application, observer/*, scope*/)
+        rtcClient = RTCClient(application, observer, socketRepo, scope)
     }
 
     override fun initializeSurfaceView(surface: SurfaceViewRenderer) {
@@ -45,7 +46,7 @@ class RTCClientWrapper(
     }
 
     override fun addIceCandidate(p0: IceCandidate?) {
-        addIceCandidate(p0)
+        rtcClient?.addIceCandidate(p0)
     }
 
 

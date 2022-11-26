@@ -3,7 +3,7 @@ package com.example.neopidorapp.feature_call.presentation.rtc_service.notificati
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import com.example.neopidorapp.feature_call.presentation.rtc_service.RTCService
+import com.example.neopidorapp.feature_call.presentation.rtc_service.CallService
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -12,7 +12,7 @@ class RTCNotificationReceiver: BroadcastReceiver() {
     override fun onReceive(p0: Context?, p1: Intent?) {
         when (p1?.action) {
             ACTION_END_CALL -> {
-                val serviceIntent = Intent(p0, RTCService::class.java)
+                val serviceIntent = Intent(p0, CallService::class.java)
                 serviceIntent.action = ACTION_END_CALL
                 p0?.startService(serviceIntent)
             }
