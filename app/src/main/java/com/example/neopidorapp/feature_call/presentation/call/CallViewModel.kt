@@ -14,7 +14,6 @@ import javax.inject.Inject
 
 @HiltViewModel
 class CallViewModel @Inject constructor(
-//    val socketRepo: SocketRepo,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -27,51 +26,12 @@ class CallViewModel @Inject constructor(
         targetName = name
     }
 
-//    val incomingMessage = socketRepo.incomingMessage
-
     //====================SCREEN STATE====================
     private val _callScreenState = MutableStateFlow(CallScreenState()) // todo must be mutable by Service state!
     val callScreenState: StateFlow<CallScreenState> = _callScreenState.asStateFlow()
     fun updateStateToDisplay(state: CallScreenState) {
         _callScreenState.value = state
     }
-//    fun updateIsIncomingCall(received: Boolean) { // todo update all these shit from service, not from fragment
-//        _callScreenState.value = callScreenState.value.copy(isIncomingCall = received)
-//    }
-//    fun updateIsOngoingCall(callRunning: Boolean) { // todo update all these shit from service, not from fragment
-//        _callScreenState.value = callScreenState.value.copy(isOngoingCall = callRunning)
-//    }
-//    fun updateIsMute(mute: Boolean) { // todo update all these shit from service, not from fragment
-//        _callScreenState.value = callScreenState.value.copy(isMute = mute)
-//    }
-//    fun updateIsCameraPaused(mute: Boolean) { // todo update all these shit from service, not from fragment
-//        _callScreenState.value = callScreenState.value.copy(isCameraPaused = mute)
-//    }
-//    fun updateIsSpeakerMode(mute: Boolean) { // todo update all these shit from service, not from fragment
-//        _callScreenState.value = callScreenState.value.copy(isSpeakerMode = mute)
-//    }
-    //====================SCREEN STATE END====================
-
-
-
-    //===========================METHODS==============================
-    /*fun initSocket() {
-        username?.let { u ->
-            socketRepo.initSocket(u)
-        }
-    }
-*/
-    //===================LISTENER METHODS======================
-    /*fun onCallButtonClick()*//* = viewModelScope.launch*//* {
-        socketRepo.sendMessageToSocket(
-            MessageModel(
-                "start_call",
-                username,
-                targetName,
-                null
-            )
-        )
-    }*/
 
     //====================RTC SERVICE CONNECTION====================
     private val _callServiceBinderState = MutableStateFlow<CallService.CallServiceBinder?>(null)

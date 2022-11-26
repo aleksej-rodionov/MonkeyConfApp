@@ -245,8 +245,8 @@ class CallFragment: Fragment(R.layout.fragment_call) {
                     "sdpCandidate" to p0?.sdp
                 )
                 callService?.sendMessageToSocket(
-//                        MessageModel("ice_candidate", username, vm.targetName, candidate)
-                    MessageModel("ice_candidate", vm.username, vm.targetName, candidate)
+//                    MessageModel("ice_candidate", vm.username, vm.targetName, candidate)
+                    MessageModel("ice_candidate", callService?.myUsername, callService?._targetName, candidate)
                 )
             }
 
@@ -288,10 +288,7 @@ class CallFragment: Fragment(R.layout.fragment_call) {
 
 
     private fun setAcceptClickListener() {
-        binding.acceptButton.setOnClickListener { // todo handle through Service.state
-//            setIncomingCallLayoutGone() // todo handle through Service.state
-//            setCallLayoutVisible()  // todo handle through Service.state
-//            setWhoToCallLayoutGone()  // todo handle through Service.state
+        binding.acceptButton.setOnClickListener {
             callService?.updateIsIncomingCall(false)
             callService?.updateIsOngoingCall(true)
 
@@ -311,7 +308,7 @@ class CallFragment: Fragment(R.layout.fragment_call) {
         binding.rejectButton.setOnClickListener {
 
             //====================LAYOUT CONFIG====================
-            setIncomingCallLayoutGone() // todo handle through Service.state
+//            setIncomingCallLayoutGone() // todo handle through Service.state
             callService?.updateIsIncomingCall(false)
             //====================LAYOUT CONFIG END====================
 
