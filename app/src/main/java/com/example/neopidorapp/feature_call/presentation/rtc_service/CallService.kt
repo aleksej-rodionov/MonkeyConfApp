@@ -17,6 +17,7 @@ import com.example.neopidorapp.feature_call.presentation.rtc_service.rtc_client.
 import com.example.neopidorapp.feature_call.presentation.rtc_service.rtc_ui_state.RTCState
 import com.example.neopidorapp.models.IceCandidateModel
 import com.example.neopidorapp.models.MessageModel
+import com.example.neopidorapp.util.Constants
 import com.example.neopidorapp.util.Constants.TAG_DEBUG
 import com.example.neopidorapp.util.currentThreadName
 import com.example.neopidorapp.util.isCurrentThreadMain
@@ -27,9 +28,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.collectLatest
-import org.webrtc.IceCandidate
-import org.webrtc.SessionDescription
-import org.webrtc.SurfaceViewRenderer
+import org.webrtc.*
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -55,6 +54,8 @@ class CallService : Service(), NotificationCallback {
     // scope is needed for notification
     private val callServiceJob = SupervisorJob()
     private val callServiceScope = CoroutineScope(Dispatchers.Main + callServiceJob)
+
+    var peerConnectionObserver: PeerConnectionObserver? = null
 
     private val rtcAudioManager by lazy { RTCAudioManager.create(this) }
 
@@ -343,6 +344,54 @@ class CallService : Service(), NotificationCallback {
     fun answerAfterInitViewsAndReceivingSession() {
         answer(_callerName, myUsername)
         updateTargetName(_callerName)
+    }
+
+    fun initPeerConnectionObserver() { // todo move to the Service?
+        peerConnectionObserver = object : PeerConnectionObserver() {
+
+
+
+            override fun onIceConnectionChange(p0: PeerConnection.IceConnectionState?) {
+                Log.d(Constants.TAG_PEER_CONNECTION, "onIceConnectionChange: newState = $p0")
+                super.onIceConnectionChange(p0)
+
+                if (p0 == PeerConnection.IceConnectionState.DISCONNECTED) {
+                    // todo release all surfaceViewRenderers;
+                    // todo OR/AND remove sll Sinks for video tracks - hz.
+
+                    // todo OR just call peerConnection.close() also.
+                    endCall()
+                }
+            }
+
+            override fun onIceCandidate(p0: IceCandidate?) {
+                Log.d(Constants.TAG_PEER_CONNECTION, "onIceCandidate: ${p0.toString()}")
+
+                super.onIceCandidate(p0)
+                addIceCandidate(p0)
+                /**
+                 * we add an ICE Candidate above...
+                 * ... and it's time to send this ICE Candidate to our peer:
+                 * SENDING ICE CANDIDATE:
+                 */
+                val candidate = hashMapOf(
+                    "sdpMid" to p0?.sdpMid,
+                    "sdpMLineIndex" to p0?.sdpMLineIndex,
+                    "sdpCandidate" to p0?.sdp
+                )
+                sendMessageToSocket(
+//                    MessageModel("ice_candidate", vm.username, vm.targetName, candidate)
+                    MessageModel("ice_candidate", myUsername, _targetName, candidate)
+                )
+            }
+
+            override fun onAddStream(p0: MediaStream?) {
+                Log.d(Constants.TAG_PEER_CONNECTION, "onAddStream: ${p0.toString()}")
+
+                super.onAddStream(p0)
+                p0?.videoTracks?.get(0)?.addSink(remoteView)
+            }
+        }
     }
     //====================METHODS END====================
 }

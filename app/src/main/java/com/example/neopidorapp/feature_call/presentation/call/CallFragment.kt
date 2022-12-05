@@ -34,7 +34,7 @@ private const val TAG_STATE_SERVICE = "TAG_STATE_SERVICE"
 class CallFragment: Fragment(R.layout.fragment_call) {
 
     private var callService: CallService? = null
-    private var peerConnectionObserver: PeerConnectionObserver? = null
+//    private var peerConnectionObserver: PeerConnectionObserver? = null
 
     private val vm: CallViewModel by viewModels()
 
@@ -112,10 +112,10 @@ class CallFragment: Fragment(R.layout.fragment_call) {
                     callService = it.service
                     callService?.initUsername(vm.username)
                     callService?.initSocket(vm.username)
-                    initPeerConnectionObserver()
+                    callService?.initPeerConnectionObserver()
                     callService?.initRtcClient(
                         (activity as MainActivity).application,
-                        peerConnectionObserver!!
+                        callService?.peerConnectionObserver!!
                     )
                     initRTCStateCollector()
                     initCallServiceEventCollector()
@@ -225,53 +225,53 @@ class CallFragment: Fragment(R.layout.fragment_call) {
 
 
     //====================PRIVATE METHODS====================
-    private fun initPeerConnectionObserver() { // todo move to the Service?
-        peerConnectionObserver = object : PeerConnectionObserver() {
-
-
-
-            override fun onIceConnectionChange(p0: PeerConnection.IceConnectionState?) {
-                Log.d(TAG_PEER_CONNECTION, "onIceConnectionChange: newState = $p0")
-                super.onIceConnectionChange(p0)
-
-                if (p0 == PeerConnection.IceConnectionState.DISCONNECTED) {
-                    // todo release all surfaceViewRenderers;
-                    // todo OR/AND remove sll Sinks for video tracks - hz.
-
-                    // todo OR just call peerConnection.close() also.
-                    endCall()
-                }
-            }
-
-            override fun onIceCandidate(p0: IceCandidate?) {
-                Log.d(TAG_PEER_CONNECTION, "onIceCandidate: ${p0.toString()}")
-
-                super.onIceCandidate(p0)
-                callService?.addIceCandidate(p0)
-                /**
-                 * we add an ICE Candidate above...
-                 * ... and it's time to send this ICE Candidate to our peer:
-                 * SENDING ICE CANDIDATE:
-                 */
-                val candidate = hashMapOf(
-                    "sdpMid" to p0?.sdpMid,
-                    "sdpMLineIndex" to p0?.sdpMLineIndex,
-                    "sdpCandidate" to p0?.sdp
-                )
-                callService?.sendMessageToSocket(
-//                    MessageModel("ice_candidate", vm.username, vm.targetName, candidate)
-                    MessageModel("ice_candidate", callService?.myUsername, callService?._targetName, candidate)
-                )
-            }
-
-            override fun onAddStream(p0: MediaStream?) {
-                Log.d(TAG_PEER_CONNECTION, "onAddStream: ${p0.toString()}")
-
-                super.onAddStream(p0)
-                p0?.videoTracks?.get(0)?.addSink(callService?.remoteView)
-            }
-        }
-    }
+//    private fun initPeerConnectionObserver() { // todo move to the Service?
+//        peerConnectionObserver = object : PeerConnectionObserver() {
+//
+//
+//
+//            override fun onIceConnectionChange(p0: PeerConnection.IceConnectionState?) {
+//                Log.d(TAG_PEER_CONNECTION, "onIceConnectionChange: newState = $p0")
+//                super.onIceConnectionChange(p0)
+//
+//                if (p0 == PeerConnection.IceConnectionState.DISCONNECTED) {
+//                    // todo release all surfaceViewRenderers;
+//                    // todo OR/AND remove sll Sinks for video tracks - hz.
+//
+//                    // todo OR just call peerConnection.close() also.
+//                    endCall()
+//                }
+//            }
+//
+//            override fun onIceCandidate(p0: IceCandidate?) {
+//                Log.d(TAG_PEER_CONNECTION, "onIceCandidate: ${p0.toString()}")
+//
+//                super.onIceCandidate(p0)
+//                callService?.addIceCandidate(p0)
+//                /**
+//                 * we add an ICE Candidate above...
+//                 * ... and it's time to send this ICE Candidate to our peer:
+//                 * SENDING ICE CANDIDATE:
+//                 */
+//                val candidate = hashMapOf(
+//                    "sdpMid" to p0?.sdpMid,
+//                    "sdpMLineIndex" to p0?.sdpMLineIndex,
+//                    "sdpCandidate" to p0?.sdp
+//                )
+//                callService?.sendMessageToSocket(
+////                    MessageModel("ice_candidate", vm.username, vm.targetName, candidate)
+//                    MessageModel("ice_candidate", callService?.myUsername, callService?._targetName, candidate)
+//                )
+//            }
+//
+//            override fun onAddStream(p0: MediaStream?) {
+//                Log.d(TAG_PEER_CONNECTION, "onAddStream: ${p0.toString()}")
+//
+//                super.onAddStream(p0)
+//                p0?.videoTracks?.get(0)?.addSink(callService?.remoteView)
+//            }
+//        }
+//    }
 
 
 
