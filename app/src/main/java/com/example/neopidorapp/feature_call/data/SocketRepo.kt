@@ -3,6 +3,7 @@ package com.example.neopidorapp.feature_call.data
 import android.util.Log
 import com.example.neopidorapp.models.MessageModel
 import com.example.neopidorapp.util.Constants.TAG_DEBUG
+import com.example.neopidorapp.util.Constants.TAG_SOCKET
 import com.example.neopidorapp.util.currentThreadName
 import com.example.neopidorapp.util.isCurrentThreadMain
 import com.google.gson.Gson
@@ -45,7 +46,7 @@ class SocketRepo(
         // (thawing-everglades-71111.herokuapp.com/ is heroku)
         // 192.168.16.100 at the flat
 //        webSocket = object : WebSocketClient(URI("ws://thawing-everglades-71111.herokuapp.com/:3000")) {
-        webSocket = object : WebSocketClient(URI("ws://192.168.16.100:3000")) {
+        webSocket = object : WebSocketClient(URI("ws://192.168.16.103:3000")) {
             override fun onOpen(handshakedata: ServerHandshake?) {
                 sendMessageToSocket(
                     MessageModel(
@@ -59,13 +60,13 @@ class SocketRepo(
 
             override fun onMessage(message: String?) {
                 try {
-                    Log.d(TAG, "onMessage: $message")
+                    Log.d(TAG_SOCKET, "onMessage: $message")
                     // todo emit some SharedFlow new value instead of triggering the interface method
 //                    newMessageInterface.onNewMessage(gson.fromJson(message, MessageModel::class.java))
                     val messageModel = gson.fromJson(message, MessageModel::class.java)
                     emitNewMessage(messageModel)
                 } catch (e: Exception) {
-                    Log.d(TAG, "onMessage: ${e.localizedMessage}")
+                    Log.d(TAG_SOCKET, "onMessage: ${e.localizedMessage}")
                     e.printStackTrace()
                 }
             }

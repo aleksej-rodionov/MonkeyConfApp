@@ -24,9 +24,7 @@ import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
-import org.webrtc.IceCandidate
-import org.webrtc.MediaStream
-import org.webrtc.SessionDescription
+import org.webrtc.*
 
 private const val TAG = "CallFragment"
 private const val TAG_STATE_VM = "TAG_STATE_VM"
@@ -208,8 +206,7 @@ class CallFragment: Fragment(R.layout.fragment_call) {
             }
 
             endCallButton.setOnClickListener {
-                callService?.endCall()
-                callService?.releaseSurfaceViews(binding.localView, binding.remoteView)
+                endCall()
             }
             //====================RTC VIEW CONTROL BUTTONS END====================
         }
@@ -228,8 +225,24 @@ class CallFragment: Fragment(R.layout.fragment_call) {
 
 
     //====================PRIVATE METHODS====================
-    private fun initPeerConnectionObserver() {
+    private fun initPeerConnectionObserver() { // todo move to the Service?
         peerConnectionObserver = object : PeerConnectionObserver() {
+
+
+
+            override fun onIceConnectionChange(p0: PeerConnection.IceConnectionState?) {
+                Log.d(TAG_PEER_CONNECTION, "onIceConnectionChange: newState = $p0")
+                super.onIceConnectionChange(p0)
+
+                if (p0 == PeerConnection.IceConnectionState.DISCONNECTED) {
+                    // todo release all surfaceViewRenderers;
+                    // todo OR/AND remove sll Sinks for video tracks - hz.
+
+                    // todo OR just call peerConnection.close() also.
+                    endCall()
+                }
+            }
+
             override fun onIceCandidate(p0: IceCandidate?) {
                 Log.d(TAG_PEER_CONNECTION, "onIceCandidate: ${p0.toString()}")
 
@@ -255,12 +268,7 @@ class CallFragment: Fragment(R.layout.fragment_call) {
                 Log.d(TAG_PEER_CONNECTION, "onAddStream: ${p0.toString()}")
 
                 super.onAddStream(p0)
-                p0?.videoTracks?.get(0)?.addSink(binding.remoteView)
-            }
-
-            override fun onRemoveStream(p0: MediaStream?) {
-                super.onRemoveStream(p0)
-                Log.d(TAG_PEER_CONNECTION, "onRemoveStream: ${p0.toString()}")
+                p0?.videoTracks?.get(0)?.addSink(callService?.remoteView)
             }
         }
     }
@@ -318,6 +326,11 @@ class CallFragment: Fragment(R.layout.fragment_call) {
             //====================LAYOUT CONFIG END====================
 
         }
+    }
+
+    private fun endCall() {
+        callService?.endCall()
+        callService?.releaseSurfaceViews(binding.localView, binding.remoteView)
     }
     //====================PRIVATE METHODS END====================
 }

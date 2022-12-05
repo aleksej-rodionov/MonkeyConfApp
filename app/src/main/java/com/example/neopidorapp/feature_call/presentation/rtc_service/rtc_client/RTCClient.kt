@@ -77,7 +77,6 @@ class RTCClient(
         }
     }
 
-    // todo where to call
     fun releaseSurfaceView(surface: SurfaceViewRenderer) {
         surface.release()
     }
@@ -179,7 +178,7 @@ class RTCClient(
                                 "type" to desc?.type
                             )
                             socketRepo.sendMessageToSocket(
-                                MessageModel("create_answeer", username, targetName, answer)
+                                MessageModel("create_answer", username, targetName, answer)
                             )
                         }
 

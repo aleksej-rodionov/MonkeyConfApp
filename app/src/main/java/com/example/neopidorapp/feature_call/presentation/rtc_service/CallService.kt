@@ -325,7 +325,7 @@ class CallService : Service(), NotificationCallback {
     }
 
     fun callAfterInitializingSurfaceViews() {
-        call( // todo ERROR OCCURS SMWHERE IN THIS BLOCK
+        call(
             _targetName ?: "",
             myUsername!!
         )
