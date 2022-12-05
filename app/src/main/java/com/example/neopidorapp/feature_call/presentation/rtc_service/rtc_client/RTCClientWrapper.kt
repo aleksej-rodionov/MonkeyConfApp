@@ -49,7 +49,9 @@ class RTCClientWrapper(
         rtcClient?.addIceCandidate(p0)
     }
 
-
+    override fun releaseSurfaceView(surface: SurfaceViewRenderer) {
+        rtcClient?.releaseSurfaceView(surface)
+    }
 
     //====================CONTROL METHODS====================
     override fun switchCamera() {

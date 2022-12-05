@@ -30,4 +30,6 @@ interface CallClientWrapper {
     fun toggleCamera(cameraPaused: Boolean)
 
     fun endCall()
+
+    fun releaseSurfaceView(surface: SurfaceViewRenderer)
 }

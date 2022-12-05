@@ -77,6 +77,11 @@ class RTCClient(
         }
     }
 
+    // todo where to call
+    fun releaseSurfaceView(surface: SurfaceViewRenderer) {
+        surface.release()
+    }
+
     fun startLocalVideo(surface: SurfaceViewRenderer) {
         val surfaceTextureHelper =
             SurfaceTextureHelper.create(Thread.currentThread().name, eglContext.eglBaseContext)

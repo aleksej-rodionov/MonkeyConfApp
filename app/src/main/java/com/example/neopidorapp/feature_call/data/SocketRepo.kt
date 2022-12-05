@@ -43,7 +43,9 @@ class SocketRepo(
         // (10.124.1.226 was of in coworking)
         // (192.168.1.136 was of in borsok)
         // (thawing-everglades-71111.herokuapp.com/ is heroku)
-        webSocket = object : WebSocketClient(URI("ws://thawing-everglades-71111.herokuapp.com/:3000")) {
+        // 192.168.16.100 at the flat
+//        webSocket = object : WebSocketClient(URI("ws://thawing-everglades-71111.herokuapp.com/:3000")) {
+        webSocket = object : WebSocketClient(URI("ws://192.168.16.100:3000")) {
             override fun onOpen(handshakedata: ServerHandshake?) {
                 sendMessageToSocket(
                     MessageModel(

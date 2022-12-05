@@ -47,6 +47,9 @@ class CallService : Service(), NotificationCallback {
         _callerName = name
     }
 
+    var localView: SurfaceViewRenderer? = null // todo store them here in case of background
+    var remoteView: SurfaceViewRenderer? = null
+
     private val callServiceBinder = CallServiceBinder()
 
     // scope is needed for notification
@@ -97,6 +100,11 @@ class CallService : Service(), NotificationCallback {
             when (it) {
                 ACTION_END_CALL -> {
                     endCall()
+                    localView?.let { lv ->
+                        remoteView?.let { rv ->
+                            releaseSurfaceViews(lv, rv)
+                        }
+                    }
                 }
                 else -> Unit
             }
@@ -264,6 +272,15 @@ class CallService : Service(), NotificationCallback {
         rtcState.updateIsOngoingCall(false)
         rtcState.updateIsIncomingCall(false) // todo why
     }
+
+    fun releaseSurfaceViews(
+        localView: SurfaceViewRenderer,
+        remoteView: SurfaceViewRenderer
+    ) {
+        Log.d(TAG_DEBUG, "releaseSurfaceViews: CALLED")
+        rtcClientWrapper.releaseSurfaceView(localView)
+        rtcClientWrapper.releaseSurfaceView(remoteView)
+    }
     //====================RTC CONTROL METHODS END====================
     //====================RTC WRAPPER METHODS END====================
 
@@ -280,7 +297,7 @@ class CallService : Service(), NotificationCallback {
         }
     }
 
-    fun onCallButtonClick(username: String?, targetName: String?)/* = viewModelScope.launch*/ {
+    fun onCallButtonClick(username: String?, targetName: String?) {
         sendMessageToSocket(
             MessageModel(
                 "start_call",
@@ -299,6 +316,9 @@ class CallService : Service(), NotificationCallback {
         localView: SurfaceViewRenderer,
         remoteView: SurfaceViewRenderer
     ) {
+        this.localView = localView
+        this.remoteView = remoteView
+
         initializeSurfaceView(localView)
         initializeSurfaceView(remoteView)
         startLocalVideo(localView)

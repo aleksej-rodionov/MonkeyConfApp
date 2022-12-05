@@ -209,6 +209,7 @@ class CallFragment: Fragment(R.layout.fragment_call) {
 
             endCallButton.setOnClickListener {
                 callService?.endCall()
+                callService?.releaseSurfaceViews(binding.localView, binding.remoteView)
             }
             //====================RTC VIEW CONTROL BUTTONS END====================
         }
@@ -256,6 +257,11 @@ class CallFragment: Fragment(R.layout.fragment_call) {
                 super.onAddStream(p0)
                 p0?.videoTracks?.get(0)?.addSink(binding.remoteView)
             }
+
+            override fun onRemoveStream(p0: MediaStream?) {
+                super.onRemoveStream(p0)
+                Log.d(TAG_PEER_CONNECTION, "onRemoveStream: ${p0.toString()}")
+            }
         }
     }
 
@@ -293,7 +299,7 @@ class CallFragment: Fragment(R.layout.fragment_call) {
             callService?.updateIsOngoingCall(true)
 
             binding.apply {
-                callService?.initializeSurfaceViewsAndStartLocalVideo(
+                callService?.initializeSurfaceViewsAndStartLocalVideo( // todo pass through viewModel and Event emitter?
                     localView,
                     remoteView
                 )
@@ -308,7 +314,6 @@ class CallFragment: Fragment(R.layout.fragment_call) {
         binding.rejectButton.setOnClickListener {
 
             //====================LAYOUT CONFIG====================
-//            setIncomingCallLayoutGone() // todo handle through Service.state
             callService?.updateIsIncomingCall(false)
             //====================LAYOUT CONFIG END====================
 
