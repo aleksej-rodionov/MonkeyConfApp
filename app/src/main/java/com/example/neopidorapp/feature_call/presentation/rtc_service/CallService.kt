@@ -6,7 +6,6 @@ import android.content.Intent
 import android.os.Binder
 import android.os.IBinder
 import android.util.Log
-import android.widget.Toast
 import com.example.neopidorapp.feature_call.data.SocketRepo
 import com.example.neopidorapp.feature_call.presentation.rtc_service.notification.NotificationCallback
 import com.example.neopidorapp.feature_call.presentation.rtc_service.notification.CallServiceNotification
@@ -19,8 +18,6 @@ import com.example.neopidorapp.models.IceCandidateModel
 import com.example.neopidorapp.models.MessageModel
 import com.example.neopidorapp.util.Constants
 import com.example.neopidorapp.util.Constants.TAG_DEBUG
-import com.example.neopidorapp.util.currentThreadName
-import com.example.neopidorapp.util.isCurrentThreadMain
 import com.google.gson.Gson
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
@@ -149,18 +146,18 @@ class CallService : Service(), NotificationCallback {
 
                         updateCallerName(socketMessage.name ?: "")
 
-                        rtcState.updateIncomingOfferMessageData(socketMessage.data)
+                        rtcState.updateIncomingOfferMessageData(socketMessage.data) // todo RTCdata
 
                         emitCallServiceEvent(CallServiceEvent.CallOfferReceived)
 
                         rtcState.updateRemoteViewLoading(false)
                     }
                     "answer_received" -> {
-                        val session = SessionDescription(
+                        val remoteSession = SessionDescription(
                             SessionDescription.Type.ANSWER,
-                            socketMessage.data.toString()
+                            socketMessage.data.toString() // todo RTCdata
                         )
-                        onRemoteSessionReceived(session)
+                        onRemoteSessionReceived(remoteSession)
 
                         rtcState.updateRemoteViewLoading(false) // STATE
                     }
@@ -299,7 +296,7 @@ class CallService : Service(), NotificationCallback {
     }
 
     fun onCallButtonClick(username: String?, targetName: String?) {
-        sendMessageToSocket(
+        sendMessageToSocket( // not needed when implement pushes, replace with smth else.
             MessageModel(
                 "start_call",
                 username,
@@ -352,20 +349,20 @@ class CallService : Service(), NotificationCallback {
 
 
             override fun onIceConnectionChange(p0: PeerConnection.IceConnectionState?) {
-                Log.d(Constants.TAG_PEER_CONNECTION, "onIceConnectionChange: newState = $p0")
+                Log.d(Constants.TAG_PEER_CONNECTION_OUTPUT, "onIceConnectionChange: newState = $p0")
                 super.onIceConnectionChange(p0)
 
                 if (p0 == PeerConnection.IceConnectionState.DISCONNECTED) {
-                    // todo release all surfaceViewRenderers;
-                    // todo OR/AND remove sll Sinks for video tracks - hz.
+                    // todo OR/AND remove sll Sinks for video tracks? - hz.
 
                     // todo OR just call peerConnection.close() also.
-                    endCall()
+//                    endCall()
+                    rtcClientWrapper.killPeerConnection()
                 }
             }
 
             override fun onIceCandidate(p0: IceCandidate?) {
-                Log.d(Constants.TAG_PEER_CONNECTION, "onIceCandidate: ${p0.toString()}")
+                Log.d(Constants.TAG_PEER_CONNECTION_OUTPUT, "onIceCandidate: ${p0.toString()}")
 
                 super.onIceCandidate(p0)
                 addIceCandidate(p0)
@@ -386,7 +383,7 @@ class CallService : Service(), NotificationCallback {
             }
 
             override fun onAddStream(p0: MediaStream?) {
-                Log.d(Constants.TAG_PEER_CONNECTION, "onAddStream: ${p0.toString()}")
+                Log.d(Constants.TAG_PEER_CONNECTION_OUTPUT, "onAddStream: ${p0.toString()}")
 
                 super.onAddStream(p0)
                 p0?.videoTracks?.get(0)?.addSink(remoteView)

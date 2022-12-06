@@ -5,6 +5,8 @@ import android.util.Log
 import com.example.neopidorapp.feature_call.data.SocketRepo
 import com.example.neopidorapp.models.MessageModel
 import com.example.neopidorapp.util.Constants.TAG_DEBUG
+import com.example.neopidorapp.util.Constants.TAG_PEER_CONNECTION_INPUT
+import com.example.neopidorapp.util.Constants.TAG_PEER_CONNECTION_OUTPUT
 import kotlinx.coroutines.CoroutineScope
 import org.webrtc.*
 
@@ -100,6 +102,7 @@ class RTCClient(
         localStream.addTrack(localAudioTrack)
         localStream.addTrack(localVideoTrack)
 
+        Log.d(TAG_PEER_CONNECTION_INPUT, "addStream(localStream)")
         peerConnection?.addStream(localStream) // peerConnectionAction
     }
 
@@ -109,6 +112,7 @@ class RTCClient(
         val mediaConstraints = MediaConstraints()
         mediaConstraints.mandatory.add(MediaConstraints.KeyValuePair("OfferToReceiveVideo", "true"))
 
+        Log.d(TAG_PEER_CONNECTION_INPUT, "createOffer")
         peerConnection?.createOffer( // peerConnectionAction
             object : SdpObserver {
                 /**
@@ -118,17 +122,18 @@ class RTCClient(
 
                 override fun onCreateSuccess(desc: SessionDescription?) {
                     // Whenever this Offer is created we also wand to add its Local Description to it.
+                    Log.d(TAG_PEER_CONNECTION_INPUT, "setLocalDescription (to offer we just created)")
                     peerConnection?.setLocalDescription( // peerConnectionAction
                         object : SdpObserver {
                             override fun onCreateSuccess(p0: SessionDescription?) {}
 
                             override fun onSetSuccess() {
-//                                Log.d(TAG_DEBUG, "desc = $desc")
+//                                Log.d(TAG_PEER_CONNECTION, "sendSDP type = ${desc?.type ?: "huy"}, SDP = ${desc?.description ?: "huy"}")
+
                                 val offer = hashMapOf(
                                     "sdp" to desc?.description,
                                     "type" to desc?.type
                                 )
-//                                Log.d(TAG_DEBUG, "offer = $offer")
                                 socketRepo.sendMessageToSocket(
                                     MessageModel("create_offer", username, targetName, offer)
                                 )
@@ -151,6 +156,7 @@ class RTCClient(
     }
 
     fun onRemoteSessionReceived(remoteSession: SessionDescription) {
+        Log.d(TAG_PEER_CONNECTION_INPUT, "setRemoteDescription")
         peerConnection?.setRemoteDescription( // peerConnectionAction
             object : SdpObserver {
                 override fun onCreateSuccess(p0: SessionDescription?) {}
@@ -166,9 +172,12 @@ class RTCClient(
         val mediaConstraints = MediaConstraints()
         mediaConstraints.mandatory.add(MediaConstraints.KeyValuePair("OfferToReceiveVideo", "true"))
 
+        Log.d(TAG_PEER_CONNECTION_INPUT, "createAnswer")
         peerConnection?.createAnswer( // peerConnectionAction
             object : SdpObserver {
-                override fun onCreateSuccess(desc: SessionDescription?) {
+                override fun onCreateSuccess(desc: SessionDescription?) { // peerConnectionAction
+
+                    Log.d(TAG_PEER_CONNECTION_INPUT, "setLocalDescription (to answer we just created)")
                     peerConnection?.setLocalDescription(object : SdpObserver {
                         override fun onCreateSuccess(p0: SessionDescription?) {}
 
@@ -196,7 +205,14 @@ class RTCClient(
     }
 
     fun addIceCandidate(p0: IceCandidate?) {
+        Log.d(TAG_PEER_CONNECTION_INPUT, "addIceCandidate(iceCandidate)")
         peerConnection?.addIceCandidate(p0) // peerConnectionAction
+    }
+
+
+
+    fun killPeerConnection() {
+        peerConnection?.dispose()
     }
 
 

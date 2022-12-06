@@ -53,6 +53,10 @@ class RTCClientWrapper(
         rtcClient?.releaseSurfaceView(surface)
     }
 
+    override fun killPeerConnection() {
+        rtcClient?.killPeerConnection()
+    }
+
     //====================CONTROL METHODS====================
     override fun switchCamera() {
         rtcClient?.switchCamera()

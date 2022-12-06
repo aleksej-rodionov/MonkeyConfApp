@@ -32,4 +32,6 @@ interface CallClientWrapper {
     fun endCall()
 
     fun releaseSurfaceView(surface: SurfaceViewRenderer)
+
+    fun killPeerConnection()
 }
