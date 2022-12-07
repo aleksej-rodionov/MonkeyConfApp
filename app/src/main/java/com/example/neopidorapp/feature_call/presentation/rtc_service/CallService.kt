@@ -19,6 +19,7 @@ import com.example.neopidorapp.models.MessageModel
 import com.example.neopidorapp.util.Constants
 import com.example.neopidorapp.util.Constants.TAG_DEBUG
 import com.example.neopidorapp.util.Constants.TAG_END_CALL
+import com.example.neopidorapp.util.Constants.TAG_SOCKET
 import com.google.gson.Gson
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
@@ -132,7 +133,7 @@ class CallService : Service(), NotificationCallback {
     private fun initIncomingSocketMessageObserver() {
         callServiceScope.launch {
             socketRepo.incomingMessage.collectLatest { socketMessage ->
-                Log.d(TAG_DEBUG, "Service.incomingMessage: \n${socketMessage.type} \n${socketMessage.data}")
+                Log.d(TAG_SOCKET, "Service.incomingMessage: \n${socketMessage.type} \n${socketMessage.data}")
 
                 when (socketMessage.type) {
                     "call_response" -> {
@@ -140,28 +141,22 @@ class CallService : Service(), NotificationCallback {
                             emitCallServiceEvent(CallServiceEvent.SnackbarMessage("user is not online"))
                         } else {
                             updateIsOngoingCall(true)
-
                             emitCallServiceEvent(CallServiceEvent.TargetIsOnlineAndReadyToReceiveACall)
                         }
                     }
                     "offer_received" -> {
-                        updateIsIncomingCall(true) // STATE
-
+                        updateIsIncomingCall(true)
                         updateCallerName(socketMessage.name ?: "")
-
-                        rtcState.updateIncomingOfferMessageData(socketMessage.data) // todo RTCdata
-
+                        rtcState.updateIncomingOfferMessageData(socketMessage.data) // RTCdata
                         emitCallServiceEvent(CallServiceEvent.CallOfferReceived)
-
                         rtcState.updateRemoteViewLoading(false)
                     }
                     "answer_received" -> {
                         val remoteSession = SessionDescription(
                             SessionDescription.Type.ANSWER,
-                            socketMessage.data.toString() // todo RTCdata
+                            socketMessage.data.toString() // RTCdata
                         )
                         onRemoteSessionReceived(remoteSession)
-
                         rtcState.updateRemoteViewLoading(false) // STATE
                     }
                     "ice_candidate" -> {
@@ -314,7 +309,7 @@ class CallService : Service(), NotificationCallback {
     }
 
     fun onEndCallBtnClick() {
-        Log.d(TAG_END_CALL, "onEndCallBtnClick: ")
+        Log.d(TAG_END_CALL, "onEndCallBtnClick")
         closePeerConnection()
         recreateRTCClient()
         sendMessageToSocket(MessageModel("end_call", myUsername, _targetName, null))
@@ -323,7 +318,7 @@ class CallService : Service(), NotificationCallback {
     }
 
     private fun onReceiveEndCall() {
-        Log.d(TAG_END_CALL, "onReceiveEndCall: ")
+        Log.d(TAG_END_CALL, "onReceiveEndCall")
         closePeerConnection()
         recreateRTCClient()
         localView?.let { lv -> remoteView?.let { rv -> releaseSurfaceViews(lv, rv) } }

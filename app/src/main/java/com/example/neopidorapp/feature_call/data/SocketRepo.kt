@@ -17,8 +17,6 @@ import org.java_websocket.handshake.ServerHandshake
 import java.net.URI
 import kotlin.Exception
 
-private const val TAG = "SocketRepo"
-
 class SocketRepo(
     private val scope: CoroutineScope
 ) {
@@ -72,11 +70,11 @@ class SocketRepo(
             }
 
             override fun onClose(code: Int, reason: String?, remote: Boolean) {
-                Log.d(TAG, "onClose: $reason")
+                Log.d(TAG_SOCKET, "onClose: $reason")
             }
 
             override fun onError(ex: Exception?) {
-                Log.d(TAG, "onError: $ex")
+                Log.d(TAG_SOCKET, "onError: $ex")
             }
         }
 
@@ -86,8 +84,6 @@ class SocketRepo(
     fun sendMessageToSocket(message: MessageModel)/* = scope.launch(Dispatchers.IO)*/ {
         try {
             webSocket?.send(Gson().toJson(message))
-            Log.d(TAG_DEBUG, "sendMessageToSocket: \nmainThread = ${isCurrentThreadMain()}, \nthreadName = ${currentThreadName()}")
-            Log.d(TAG_DEBUG, "sendMessageToSocket: message = $message")
         } catch (e: Exception) {
             Log.d(TAG_DEBUG, "sendMessageToSocket: e = ${e.localizedMessage}")
             e.printStackTrace()
