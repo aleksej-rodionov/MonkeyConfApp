@@ -33,5 +33,5 @@ interface CallClientWrapper {
 
     fun releaseSurfaceView(surface: SurfaceViewRenderer)
 
-    fun killPeerConnection()
+    fun nullizeRTCClient()
 }

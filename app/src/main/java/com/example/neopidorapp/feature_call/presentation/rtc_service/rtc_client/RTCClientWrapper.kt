@@ -53,8 +53,9 @@ class RTCClientWrapper(
         rtcClient?.releaseSurfaceView(surface)
     }
 
-    override fun killPeerConnection() {
-        rtcClient?.killPeerConnection()
+    override fun nullizeRTCClient() {
+//        rtcClient?.killPeerConnection()
+        rtcClient = null
     }
 
     //====================CONTROL METHODS====================

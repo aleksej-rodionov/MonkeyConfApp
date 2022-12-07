@@ -210,11 +210,11 @@ class RTCClient(
 
 
 
-    fun killPeerConnection() {
-        peerConnection?.dispose()
-//        peerConnection?.close()
-        peerConnectionFactory?.dispose()
-    }
+//    fun killPeerConnection() {
+//        peerConnection?.dispose()
+////        peerConnection?.close()
+//        peerConnectionFactory?.dispose()
+//    }
 
 
 

@@ -18,6 +18,7 @@ import com.example.neopidorapp.models.IceCandidateModel
 import com.example.neopidorapp.models.MessageModel
 import com.example.neopidorapp.util.Constants
 import com.example.neopidorapp.util.Constants.TAG_DEBUG
+import com.example.neopidorapp.util.Constants.TAG_END_CALL
 import com.google.gson.Gson
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
@@ -205,8 +206,9 @@ class CallService : Service(), NotificationCallback {
 
 
 
-    fun initRtcClient(application: Application, observer: PeerConnectionObserver) {
-        rtcClientWrapper.initRtcClient(application, observer)
+    fun initRtcClient(/*application: Application, observer: PeerConnectionObserver*/) {
+//        rtcClientWrapper.initRtcClient(application, observer)
+        rtcClientWrapper.initRtcClient(this.application, peerConnectionObserver!!)
     }
 
     private fun initializeSurfaceView(surface: SurfaceViewRenderer) {
@@ -312,22 +314,29 @@ class CallService : Service(), NotificationCallback {
     }
 
     fun onEndCallBtnClick() {
+        Log.d(TAG_END_CALL, "onEndCallBtnClick: ")
         closePeerConnection()
-        // todo nullize and recreate RTCClient instance
+        recreateRTCClient()
         sendMessageToSocket(MessageModel("end_call", myUsername, _targetName, null))
         localView?.let { lv -> remoteView?.let { rv -> releaseSurfaceViews(lv, rv) } }
         setViewsToDefaultStateAfterEndingCall()
     }
 
     private fun onReceiveEndCall() {
+        Log.d(TAG_END_CALL, "onReceiveEndCall: ")
         closePeerConnection()
-        // todo nullize and recreate RTCClient instance
+        recreateRTCClient()
         localView?.let { lv -> remoteView?.let { rv -> releaseSurfaceViews(lv, rv) } }
         setViewsToDefaultStateAfterEndingCall()
     }
 
     private fun closePeerConnection() {
         rtcClientWrapper.closePeerConnection()
+    }
+
+    private fun recreateRTCClient() {
+        rtcClientWrapper.nullizeRTCClient()
+        rtcClientWrapper.initRtcClient(this.application, peerConnectionObserver!!)
     }
 
     private fun setViewsToDefaultStateAfterEndingCall() {
@@ -388,7 +397,7 @@ class CallService : Service(), NotificationCallback {
 //                    endCall()
 //                    rtcClientWrapper.killPeerConnection()
 
-
+                    // todo call nullizeRTCClient() ???
                 }
             }
 
