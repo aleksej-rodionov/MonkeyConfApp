@@ -70,8 +70,8 @@ class RTCClientWrapper(
         rtcClient?.toggleCamera(cameraPaused)
     }
 
-    override fun endCall() {
-        rtcClient?.endCall()
+    override fun closePeerConnection() {
+        rtcClient?.closePeerConnection()
     }
     //====================CONTROL METHODS END====================
     //====================RTC WRAPPER METHODS END====================

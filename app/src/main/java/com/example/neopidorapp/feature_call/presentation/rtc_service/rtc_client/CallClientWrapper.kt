@@ -29,7 +29,7 @@ interface CallClientWrapper {
 
     fun toggleCamera(cameraPaused: Boolean)
 
-    fun endCall()
+    fun closePeerConnection()
 
     fun releaseSurfaceView(surface: SurfaceViewRenderer)
 

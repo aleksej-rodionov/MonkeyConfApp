@@ -186,7 +186,8 @@ class CallFragment: Fragment(R.layout.fragment_call) {
             }
 
             endCallButton.setOnClickListener {
-                endCall()
+//                endCall()
+                callService?.onEndCallBtnClick()
             }
             //====================RTC VIEW CONTROL BUTTONS END====================
         }
@@ -257,9 +258,9 @@ class CallFragment: Fragment(R.layout.fragment_call) {
         }
     }
 
-    private fun endCall() {
-        callService?.endCall()
-        callService?.releaseSurfaceViews(binding.localView, binding.remoteView)
-    }
+//    private fun endCall() {
+//        callService?.endCall()
+//        callService?.releaseSurfaceViews(binding.localView, binding.remoteView)
+//    }
     //====================PRIVATE METHODS END====================
 }

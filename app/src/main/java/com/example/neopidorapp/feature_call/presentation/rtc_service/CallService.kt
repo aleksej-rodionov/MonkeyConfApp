@@ -63,7 +63,7 @@ class CallService : Service(), NotificationCallback {
 
     private val _callServiceEvent = MutableSharedFlow<CallServiceEvent>()
     val callServiceEvent: SharedFlow<CallServiceEvent> = _callServiceEvent.asSharedFlow()
-    fun emitCallServiceEvent(event: CallServiceEvent) = callServiceScope.launch {
+    private fun emitCallServiceEvent(event: CallServiceEvent) = callServiceScope.launch {
         _callServiceEvent.emit(event)
     }
 
@@ -97,12 +97,14 @@ class CallService : Service(), NotificationCallback {
         intent?.action?.let {
             when (it) {
                 ACTION_END_CALL -> {
-                    endCall()
-                    localView?.let { lv ->
-                        remoteView?.let { rv ->
-                            releaseSurfaceViews(lv, rv)
-                        }
-                    }
+//                    endCall()
+//                    localView?.let { lv ->
+//                        remoteView?.let { rv ->
+//                            releaseSurfaceViews(lv, rv)
+//                        }
+//                    }
+
+                    onEndCallBtnClick()
                 }
                 else -> Unit
             }
@@ -178,6 +180,9 @@ class CallService : Service(), NotificationCallback {
                             e.printStackTrace()
                         }
                     }
+                    "end_call" -> {
+                        onReceiveEndCall()
+                    }
                 }
             }
         }
@@ -204,11 +209,11 @@ class CallService : Service(), NotificationCallback {
         rtcClientWrapper.initRtcClient(application, observer)
     }
 
-    fun initializeSurfaceView(surface: SurfaceViewRenderer) {
+    private fun initializeSurfaceView(surface: SurfaceViewRenderer) {
         rtcClientWrapper.initializeSurfaceView(surface)
     }
 
-    fun startLocalVideo(surface: SurfaceViewRenderer) {
+    private fun startLocalVideo(surface: SurfaceViewRenderer) {
         rtcClientWrapper.startLocalVideo(surface)
     }
 
@@ -216,11 +221,11 @@ class CallService : Service(), NotificationCallback {
         rtcClientWrapper.call(targetName, username, socketRepo)
     }
 
-    fun onRemoteSessionReceived(remoteSession: SessionDescription) {
+    private fun onRemoteSessionReceived(remoteSession: SessionDescription) {
         rtcClientWrapper.onRemoteSessionReceived(remoteSession)
     }
 
-    fun answer(targetName: String, username: String) {
+    private fun answer(targetName: String, username: String) {
         rtcClientWrapper.answer(targetName, username, socketRepo)
     }
 
@@ -265,13 +270,13 @@ class CallService : Service(), NotificationCallback {
         rtcState.updateIsSpeakerMode(!rtcState.currentState().isSpeakerMode)
     }
 
-    fun endCall() {
-        rtcClientWrapper.endCall()
-        rtcState.updateIsOngoingCall(false)
-        rtcState.updateIsIncomingCall(false) // todo why
-    }
+//    fun endCall() {
+//        rtcClientWrapper.endCall()
+//        rtcState.updateIsOngoingCall(false)
+//        rtcState.updateIsIncomingCall(false) // todo why
+//    }
 
-    fun releaseSurfaceViews(
+    private fun releaseSurfaceViews(
         localView: SurfaceViewRenderer,
         remoteView: SurfaceViewRenderer
     ) {
@@ -306,6 +311,30 @@ class CallService : Service(), NotificationCallback {
         )
     }
 
+    fun onEndCallBtnClick() {
+        closePeerConnection()
+        // todo nullize and recreate RTCClient instance
+        sendMessageToSocket(MessageModel("end_call", myUsername, _targetName, null))
+        localView?.let { lv -> remoteView?.let { rv -> releaseSurfaceViews(lv, rv) } }
+        setViewsToDefaultStateAfterEndingCall()
+    }
+
+    private fun onReceiveEndCall() {
+        closePeerConnection()
+        // todo nullize and recreate RTCClient instance
+        localView?.let { lv -> remoteView?.let { rv -> releaseSurfaceViews(lv, rv) } }
+        setViewsToDefaultStateAfterEndingCall()
+    }
+
+    private fun closePeerConnection() {
+        rtcClientWrapper.closePeerConnection()
+    }
+
+    private fun setViewsToDefaultStateAfterEndingCall() {
+        rtcState.updateIsOngoingCall(false)
+        rtcState.updateIsIncomingCall(false) // todo why
+    }
+
     fun sendMessageToSocket(messageModel: MessageModel) {
         socketRepo.sendMessageToSocket(messageModel)
     }
@@ -324,8 +353,8 @@ class CallService : Service(), NotificationCallback {
 
     fun callAfterInitializingSurfaceViews() {
         call(
-            _targetName ?: "",
-            myUsername!!
+            _targetName,
+            myUsername
         )
     }
 
@@ -357,7 +386,9 @@ class CallService : Service(), NotificationCallback {
 
                     // todo OR just call peerConnection.close() also.
 //                    endCall()
-                    rtcClientWrapper.killPeerConnection()
+//                    rtcClientWrapper.killPeerConnection()
+
+
                 }
             }
 
@@ -383,7 +414,7 @@ class CallService : Service(), NotificationCallback {
             }
 
             override fun onAddStream(p0: MediaStream?) {
-                Log.d(Constants.TAG_PEER_CONNECTION_OUTPUT, "onAddStream: ${p0.toString()}")
+                Log.d(Constants.TAG_PEER_CONNECTION_OUTPUT, "onAddStream(remote): ${p0.toString()}")
 
                 super.onAddStream(p0)
                 p0?.videoTracks?.get(0)?.addSink(remoteView)

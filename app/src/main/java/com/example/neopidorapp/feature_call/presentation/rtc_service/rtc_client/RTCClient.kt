@@ -102,7 +102,7 @@ class RTCClient(
         localStream.addTrack(localAudioTrack)
         localStream.addTrack(localVideoTrack)
 
-        Log.d(TAG_PEER_CONNECTION_INPUT, "addStream(localStream)")
+        Log.d(TAG_PEER_CONNECTION_INPUT, "addStream(local): ${localStream.toString()}")
         peerConnection?.addStream(localStream) // peerConnectionAction
     }
 
@@ -122,13 +122,12 @@ class RTCClient(
 
                 override fun onCreateSuccess(desc: SessionDescription?) {
                     // Whenever this Offer is created we also wand to add its Local Description to it.
-                    Log.d(TAG_PEER_CONNECTION_INPUT, "setLocalDescription (to offer we just created)")
+                    Log.d(TAG_PEER_CONNECTION_INPUT, "setLocalDescription (to offer we just created)\n=====DESCRIPTION=====\n${desc?.description ?: "NULL"}")
                     peerConnection?.setLocalDescription( // peerConnectionAction
                         object : SdpObserver {
                             override fun onCreateSuccess(p0: SessionDescription?) {}
 
                             override fun onSetSuccess() {
-//                                Log.d(TAG_PEER_CONNECTION, "sendSDP type = ${desc?.type ?: "huy"}, SDP = ${desc?.description ?: "huy"}")
 
                                 val offer = hashMapOf(
                                     "sdp" to desc?.description,
@@ -175,10 +174,10 @@ class RTCClient(
         Log.d(TAG_PEER_CONNECTION_INPUT, "createAnswer")
         peerConnection?.createAnswer( // peerConnectionAction
             object : SdpObserver {
-                override fun onCreateSuccess(desc: SessionDescription?) { // peerConnectionAction
+                override fun onCreateSuccess(desc: SessionDescription?) {
 
-                    Log.d(TAG_PEER_CONNECTION_INPUT, "setLocalDescription (to answer we just created)")
-                    peerConnection?.setLocalDescription(object : SdpObserver {
+                    Log.d(TAG_PEER_CONNECTION_INPUT, "setLocalDescription (to answer we just created)\n=====DESCRIPTION=====\n${desc?.description ?: "NULL"}")
+                    peerConnection?.setLocalDescription(object : SdpObserver { // peerConnectionAction
                         override fun onCreateSuccess(p0: SessionDescription?) {}
 
                         override fun onSetSuccess() {
@@ -213,6 +212,8 @@ class RTCClient(
 
     fun killPeerConnection() {
         peerConnection?.dispose()
+//        peerConnection?.close()
+        peerConnectionFactory?.dispose()
     }
 
 
@@ -230,7 +231,7 @@ class RTCClient(
         localVideoTrack?.setEnabled(!cameraPaused)
     }
 
-    fun endCall() {
+    fun closePeerConnection() {
         peerConnection?.close()
     }
     //====================CONTROL METHODS END====================
