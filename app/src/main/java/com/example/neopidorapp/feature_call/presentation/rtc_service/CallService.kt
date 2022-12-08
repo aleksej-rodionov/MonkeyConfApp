@@ -48,6 +48,8 @@ class CallService : Service(), NotificationCallback {
     var localView: SurfaceViewRenderer? = null // todo store them here in case of background
     var remoteView: SurfaceViewRenderer? = null
 
+    private var remoteMediaStream: MediaStream? = null
+
     private val callServiceBinder = CallServiceBinder()
 
     // scope is needed for notification
@@ -145,6 +147,7 @@ class CallService : Service(), NotificationCallback {
                         }
                     }
                     "offer_received" -> {
+                        recreateRTCClient()
                         updateIsIncomingCall(true)
                         updateCallerName(socketMessage.name ?: "")
                         rtcState.updateIncomingOfferMessageData(socketMessage.data) // RTCdata
@@ -298,6 +301,7 @@ class CallService : Service(), NotificationCallback {
     }
 
     fun onCallButtonClick(username: String?, targetName: String?) {
+        recreateRTCClient()
         sendMessageToSocket( // not needed when implement pushes, replace with smth else.
             MessageModel(
                 "start_call",
@@ -310,19 +314,31 @@ class CallService : Service(), NotificationCallback {
 
     fun onEndCallBtnClick() {
         Log.d(TAG_END_CALL, "onEndCallBtnClick")
+
+        remoteMediaStream?.videoTracks?.get(0)?.removeSink(remoteView)
+//        remoteMediaStream?.videoTracks?.forEach {
+//            it.
+//        }
+
         closePeerConnection()
-        recreateRTCClient()
         sendMessageToSocket(MessageModel("end_call", myUsername, _targetName, null))
         localView?.let { lv -> remoteView?.let { rv -> releaseSurfaceViews(lv, rv) } }
         setViewsToDefaultStateAfterEndingCall()
+        recreateRTCClient()
     }
 
     private fun onReceiveEndCall() {
         Log.d(TAG_END_CALL, "onReceiveEndCall")
+
+        remoteMediaStream?.videoTracks?.get(0)?.removeSink(remoteView)
+//        remoteMediaStream?.videoTracks?.forEach {
+//            it.
+//        }
+
         closePeerConnection()
-        recreateRTCClient()
         localView?.let { lv -> remoteView?.let { rv -> releaseSurfaceViews(lv, rv) } }
         setViewsToDefaultStateAfterEndingCall()
+        recreateRTCClient()
     }
 
     private fun closePeerConnection() {
@@ -419,9 +435,11 @@ class CallService : Service(), NotificationCallback {
 
             override fun onAddStream(p0: MediaStream?) {
                 Log.d(Constants.TAG_PEER_CONNECTION_OUTPUT, "onAddStream(remote): ${p0.toString()}")
-
                 super.onAddStream(p0)
-                p0?.videoTracks?.get(0)?.addSink(remoteView)
+
+//                p0?.videoTracks?.get(0)?.addSink(remoteView)
+                remoteMediaStream = p0
+                remoteMediaStream?.videoTracks?.get(0)?.addSink(remoteView)
             }
         }
     }
@@ -435,3 +453,12 @@ sealed class CallServiceEvent {
     object TargetIsOnlineAndReadyToReceiveACall: CallServiceEvent()
     object CallOfferReceived: CallServiceEvent()
 }
+
+
+
+
+
+
+
+
+
