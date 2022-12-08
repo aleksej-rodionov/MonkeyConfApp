@@ -5,6 +5,7 @@ import android.util.Log
 import com.example.neopidorapp.feature_call.data.SocketRepo
 import com.example.neopidorapp.models.MessageModel
 import com.example.neopidorapp.util.Constants.TAG_DEBUG
+import com.example.neopidorapp.util.Constants.TAG_PEER_CONNECTION_BASE
 import com.example.neopidorapp.util.Constants.TAG_PEER_CONNECTION_INPUT
 import com.example.neopidorapp.util.Constants.TAG_PEER_CONNECTION_OUTPUT
 import kotlinx.coroutines.CoroutineScope
@@ -264,6 +265,7 @@ class RTCClient(
     }
 
     private fun createPeerConnection(observer: PeerConnection.Observer): PeerConnection? {
+        Log.d(TAG_PEER_CONNECTION_BASE, "createPeerConnection: ")
         return peerConnectionFactory.createPeerConnection(iceServer, observer)
     }
 

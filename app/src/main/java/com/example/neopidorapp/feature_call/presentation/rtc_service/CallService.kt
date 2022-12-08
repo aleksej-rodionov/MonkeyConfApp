@@ -322,6 +322,7 @@ class CallService : Service(), NotificationCallback {
 
         closePeerConnection()
         sendMessageToSocket(MessageModel("end_call", myUsername, _targetName, null))
+        resetPeerConnectionObserver()
         localView?.let { lv -> remoteView?.let { rv -> releaseSurfaceViews(lv, rv) } }
         setViewsToDefaultStateAfterEndingCall()
         recreateRTCClient()
@@ -337,6 +338,7 @@ class CallService : Service(), NotificationCallback {
 
         closePeerConnection()
         localView?.let { lv -> remoteView?.let { rv -> releaseSurfaceViews(lv, rv) } }
+        resetPeerConnectionObserver()
         setViewsToDefaultStateAfterEndingCall()
         recreateRTCClient()
     }
@@ -442,6 +444,11 @@ class CallService : Service(), NotificationCallback {
                 remoteMediaStream?.videoTracks?.get(0)?.addSink(remoteView)
             }
         }
+    }
+
+    fun resetPeerConnectionObserver() {
+        peerConnectionObserver = null
+        initPeerConnectionObserver()
     }
     //====================METHODS END====================
 }
