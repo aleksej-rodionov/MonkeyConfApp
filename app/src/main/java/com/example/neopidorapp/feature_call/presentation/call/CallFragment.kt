@@ -80,7 +80,7 @@ class CallFragment: Fragment(R.layout.fragment_call) {
                     videoButton.setImageResource(if (state.isCameraPaused) R.drawable.ic_baseline_videocam_off_24
                     else R.drawable.ic_baseline_videocam_24)
 
-                    audioOutputButton.setImageResource(if (state.isSpeakerMode) R.drawable.ic_baseline_cameraswitch_24
+                    audioOutputButton.setImageResource(if (state.isSpeakerMode) R.drawable.ic_baseline_speaker_up_24
                     else R.drawable.ic_baseline_hearing_24)
                 }
             }

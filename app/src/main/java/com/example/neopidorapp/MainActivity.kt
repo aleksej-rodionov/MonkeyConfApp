@@ -5,9 +5,11 @@ import android.content.Intent
 import android.content.ServiceConnection
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import com.example.neopidorapp.databinding.ActivityMainBinding
+import com.example.neopidorapp.feature_call.presentation.name.NameFragmentDirections
 import com.example.neopidorapp.feature_call.presentation.rtc_service.CallService
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -23,6 +25,11 @@ class MainActivity : AppCompatActivity() {
 
         val navHost = supportFragmentManager.findFragmentById(R.id.fragmentContainer) as NavHostFragment
         navController = navHost.navController
+
+        val username = intent.getStringExtra("myUsername")
+        username?.let {
+            navController.navigate(NameFragmentDirections.actionNameFragmentToCallFragment(it))
+        }
     }
 
     override fun onSupportNavigateUp(): Boolean {

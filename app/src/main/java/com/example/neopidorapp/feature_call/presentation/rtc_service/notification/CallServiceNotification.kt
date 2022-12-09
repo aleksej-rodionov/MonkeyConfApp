@@ -40,6 +40,8 @@ class CallServiceNotification(
     override fun showRtcNotification(state: RTCUiState) {
 
         val activityIntent = Intent(callService, MainActivity::class.java)
+//        activityIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        activityIntent.putExtra("myUsername", callService.myUsername);
         val activityPendingIntent = PendingIntent.getActivity(
             callService, 1, activityIntent,
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)

@@ -73,11 +73,11 @@ class CallService : Service(), NotificationCallback {
     }
 
     //====================RTCCLIENT AND ITS NOTIFICATION====================
-    val rtcState = RTCState()
+    val rtcState = RTCState() // todo all updaters of this should be called from callClientWrapper?
 
     val rtcClientWrapper by lazy {
         RTCClientWrapper(
-            rtcState,
+//            rtcState,
             this,
             socketRepo,
             callServiceScope

@@ -10,7 +10,7 @@ import org.webrtc.SessionDescription
 import org.webrtc.SurfaceViewRenderer
 
 class RTCClientWrapper(
-    private val rtcUiStateControl: RTCUiStateControl,
+//    private val rtcUiStateControl: RTCUiStateControl,
     private val notificationCallback: NotificationCallback,
     private val socketRepo: SocketRepo,
     private val scope: CoroutineScope
@@ -35,6 +35,7 @@ class RTCClientWrapper(
 
     override fun call(targetName: String, username: String, socketRepo: SocketRepo) {
         rtcClient?.call(targetName, username, socketRepo)
+        notificationCallback.launchNotification()
     }
 
     override fun onRemoteSessionReceived(remoteSession: SessionDescription) {
@@ -47,6 +48,7 @@ class RTCClientWrapper(
 
     override fun addIceCandidate(p0: IceCandidate?) {
         rtcClient?.addIceCandidate(p0)
+        notificationCallback.launchNotification()
     }
 
     override fun releaseSurfaceView(surface: SurfaceViewRenderer) {
