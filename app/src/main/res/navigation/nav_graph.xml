@@ -20,4 +20,7 @@
             android:name="username"
             app:argType="string" />
     </fragment>
+    <action
+        android:id="@+id/action_global_callFragment"
+        app:destination="@id/callFragment"/>
 </navigation>

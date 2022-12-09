@@ -6,6 +6,7 @@ import android.content.Intent
 import android.os.Binder
 import android.os.IBinder
 import android.util.Log
+import androidx.navigation.NavDeepLinkBuilder
 import com.example.neopidorapp.feature_call.data.SocketRepo
 import com.example.neopidorapp.feature_call.presentation.rtc_service.notification.NotificationCallback
 import com.example.neopidorapp.feature_call.presentation.rtc_service.notification.CallServiceNotification
@@ -20,6 +21,7 @@ import com.example.neopidorapp.util.Constants
 import com.example.neopidorapp.util.Constants.TAG_DEBUG
 import com.example.neopidorapp.util.Constants.TAG_END_CALL
 import com.example.neopidorapp.util.Constants.TAG_PEER_CONNECTION_OUTPUT
+import com.example.neopidorapp.util.Constants.TAG_SERVICE
 import com.example.neopidorapp.util.Constants.TAG_SOCKET
 import com.google.gson.Gson
 import dagger.hilt.android.AndroidEntryPoint
@@ -84,19 +86,21 @@ class CallService : Service(), NotificationCallback {
         )
     }
 
-    val notification = CallServiceNotification(callServiceScope, this)
+    val notification = CallServiceNotification(this, callServiceScope, this)
     //====================RTCCLIENT AND ITS NOTIFICATION END====================
 
 
     //====================OVERRIDDEN SERVICE METHODS====================
     override fun onCreate() {
         super.onCreate()
+        Log.d(TAG_SERVICE, "onCreate: ")
         initIncomingSocketMessageObserver()
         initPeerConnectionObserver()
         initRtcClient()
     }
 
     override fun onBind(p0: Intent?): IBinder? {
+        Log.d(TAG_SERVICE, "onBind: ")
         return callServiceBinder
     }
 
@@ -122,11 +126,13 @@ class CallService : Service(), NotificationCallback {
 
     override fun onTaskRemoved(rootIntent: Intent?) {
         super.onTaskRemoved(rootIntent)
+        Log.d(TAG_SERVICE, "onTaskRemoved: ")
         stopSelf()
     }
 
     override fun onDestroy() {
         super.onDestroy()
+        Log.d(TAG_SERVICE, "onDestroy: ")
         // todo stop and nullize rtc connection?
         callServiceScope.cancel()
     }

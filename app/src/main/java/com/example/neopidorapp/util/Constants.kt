@@ -9,4 +9,7 @@ object Constants {
     const val TAG_PEER_CONNECTION_INPUT = "TAG_PEER_CONNECTION_INPUT"
     const val TAG_PEER_CONNECTION_BASE = "TAG_PEER_CONNECTION_BASE"
     const val TAG_END_CALL = "TAG_END_CALL"
+    const val TAG_BACKSTACK = "TAG_BACKSTACK"
+    const val TAG_SERVICE = "TAG_SERVICE"
+    const val TAG_HASHCODE = "TAG_HASHCODE"
 }

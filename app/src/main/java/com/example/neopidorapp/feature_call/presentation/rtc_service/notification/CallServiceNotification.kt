@@ -1,11 +1,14 @@
 package com.example.neopidorapp.feature_call.presentation.rtc_service.notification
 
 import android.app.PendingIntent
+import android.content.Context
 import android.content.Intent
 import androidx.core.app.NotificationCompat
+import androidx.navigation.NavDeepLinkBuilder
 import com.example.neopidorapp.MainActivity
 import com.example.neopidorapp.NeoPidorApp
 import com.example.neopidorapp.R
+import com.example.neopidorapp.feature_call.presentation.call.CallFragmentArgs
 import com.example.neopidorapp.feature_call.presentation.rtc_service.CallService
 import com.example.neopidorapp.feature_call.presentation.rtc_service.rtc_ui_state.RTCUiState
 import kotlinx.coroutines.CoroutineScope
@@ -14,6 +17,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 class CallServiceNotification(
+    private val context: Context,
     private val scope: CoroutineScope,
     private val callService: CallService
 ): NotificationControl {
@@ -41,10 +45,17 @@ class CallServiceNotification(
 
         val activityIntent = Intent(callService, MainActivity::class.java)
 //        activityIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        activityIntent.putExtra("openFragment", "callFragment");
         activityIntent.putExtra("myUsername", callService.myUsername);
         val activityPendingIntent = PendingIntent.getActivity(
             callService, 1, activityIntent,
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
+
+//        val callFragmentPendingIntent = NavDeepLinkBuilder(context)
+//            .setGraph(R.navigation.nav_graph)
+//            .setDestination(R.id.callFragment)
+//            .setArguments(CallFragmentArgs.Builder(callService.myUsername).build().toBundle())
+//            .createPendingIntent()
 
         val endCallIntent = Intent(callService, RTCNotificationReceiver::class.java)
         endCallIntent.action = RTCNotificationReceiver.ACTION_END_CALL
@@ -61,6 +72,7 @@ class CallServiceNotification(
         }
 
         notificationBuilder.setContentIntent(activityPendingIntent)
+//        notificationBuilder.setContentIntent(callFragmentPendingIntent)
 
         val notification = notificationBuilder.setStyle(
             androidx.media.app.NotificationCompat.MediaStyle().setShowActionsInCompactView())

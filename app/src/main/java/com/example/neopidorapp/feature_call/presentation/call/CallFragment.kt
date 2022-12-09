@@ -13,6 +13,10 @@ import com.example.neopidorapp.R
 import com.example.neopidorapp.databinding.FragmentCallBinding
 import com.example.neopidorapp.feature_call.presentation.rtc_service.CallService
 import com.example.neopidorapp.feature_call.presentation.rtc_service.CallServiceEvent
+import com.example.neopidorapp.util.Constants
+import com.example.neopidorapp.util.Constants.TAG_BACKSTACK
+import com.example.neopidorapp.util.Constants.TAG_HASHCODE
+import com.example.neopidorapp.util.Constants.TAG_SERVICE
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
@@ -90,6 +94,8 @@ class CallFragment: Fragment(R.layout.fragment_call) {
             vm.callServiceBinderState.collectLatest {
                 if (it != null) {
                     callService = it.service
+                    Log.d(TAG_HASHCODE, "onResume: it.service Hashcode = ${it.service.hashCode()}")
+                    Log.d(TAG_HASHCODE, "onResume: callService Hashcode = ${callService?.hashCode() ?: "null"}")
                     callService?.initUsername(vm.username)
                     callService?.initSocket(vm.username)
 //                    callService?.initPeerConnectionObserver()
@@ -145,6 +151,7 @@ class CallFragment: Fragment(R.layout.fragment_call) {
                         setRejectClickListener()
                     }
                     is CallServiceEvent.NeedToRestartService -> {
+                        Log.d(TAG_SERVICE, "Event.NeedToRestartService: ")
                         (activity as MainActivity).stopCallService()
                         (activity as MainActivity).startCallService()
                         (activity as MainActivity).bindCallService(vm.getCallServiceConnection())
@@ -198,6 +205,8 @@ class CallFragment: Fragment(R.layout.fragment_call) {
     override fun onResume() {
         super.onResume()
         (activity as MainActivity).bindCallService(vm.getCallServiceConnection())
+
+        Log.d(TAG_HASHCODE, "onResume: fragmentHashcode = ${this.hashCode()}")
     }
 
     override fun onDestroyView() {
