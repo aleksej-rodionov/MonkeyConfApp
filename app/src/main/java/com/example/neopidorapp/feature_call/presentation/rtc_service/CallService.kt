@@ -92,6 +92,8 @@ class CallService : Service(), NotificationCallback {
     override fun onCreate() {
         super.onCreate()
         initIncomingSocketMessageObserver()
+        initPeerConnectionObserver()
+        initRtcClient()
     }
 
     override fun onBind(p0: Intent?): IBinder? {
@@ -205,8 +207,7 @@ class CallService : Service(), NotificationCallback {
 
 
 
-    fun initRtcClient(/*application: Application, observer: PeerConnectionObserver*/) {
-//        rtcClientWrapper.initRtcClient(application, observer)
+    fun initRtcClient() {
         rtcClientWrapper.initRtcClient(this.application, peerConnectionObserver!!)
     }
 

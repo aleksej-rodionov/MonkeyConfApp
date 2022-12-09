@@ -92,11 +92,8 @@ class CallFragment: Fragment(R.layout.fragment_call) {
                     callService = it.service
                     callService?.initUsername(vm.username)
                     callService?.initSocket(vm.username)
-                    callService?.initPeerConnectionObserver()
-                    callService?.initRtcClient(
-//                        (activity as MainActivity).application,
-//                        callService?.peerConnectionObserver!!
-                    )
+//                    callService?.initPeerConnectionObserver()
+//                    callService?.initRtcClient()
                     initRTCStateCollector()
                     initCallServiceEventCollector()
                 } else {
