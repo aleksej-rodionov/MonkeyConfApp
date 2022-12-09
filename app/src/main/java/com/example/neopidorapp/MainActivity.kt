@@ -31,28 +31,28 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        startRTCService()
+        startCallService()
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        stopRTCService()
+        stopCallService()
     }
 
     
     
     //====================RTC SERVICE====================
-    private fun startRTCService() {
+    fun startCallService() {
         val serviceIntent = Intent(this, CallService::class.java)
         startService(serviceIntent)
     }
 
-    fun bindRTCService(conn: ServiceConnection) {
+    fun bindCallService(conn: ServiceConnection) {
         val serviceIntent = Intent(this, CallService::class.java)
         bindService(serviceIntent, conn, Context.BIND_AUTO_CREATE)
     }
 
-    fun stopRTCService() {
+    fun stopCallService() {
         stopService(Intent(this, CallService::class.java))
     }
     //====================RTC SERVICE END====================

@@ -123,7 +123,7 @@ class RTCClient(
 
                 override fun onCreateSuccess(desc: SessionDescription?) {
                     // Whenever this Offer is created we also wand to add its Local Description to it.
-                    Log.d(TAG_PEER_CONNECTION_INPUT, "setLocalDescription (to offer we just created)\n=====DESCRIPTION=====\n${desc?.description ?: "NULL"}")
+                    Log.d(TAG_PEER_CONNECTION_INPUT, "setLocalDescription (to offer we just created)")
                     peerConnection?.setLocalDescription( // peerConnectionAction
                         object : SdpObserver {
                             override fun onCreateSuccess(p0: SessionDescription?) {}
@@ -177,7 +177,7 @@ class RTCClient(
             object : SdpObserver {
                 override fun onCreateSuccess(desc: SessionDescription?) {
 
-                    Log.d(TAG_PEER_CONNECTION_INPUT, "setLocalDescription (to answer we just created)\n=====DESCRIPTION=====\n${desc?.description ?: "NULL"}")
+                    Log.d(TAG_PEER_CONNECTION_INPUT, "setLocalDescription (to answer we just created)")
                     peerConnection?.setLocalDescription(object : SdpObserver { // peerConnectionAction
                         override fun onCreateSuccess(p0: SessionDescription?) {}
 

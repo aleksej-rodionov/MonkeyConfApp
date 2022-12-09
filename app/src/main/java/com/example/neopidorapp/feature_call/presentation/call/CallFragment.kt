@@ -147,6 +147,11 @@ class CallFragment: Fragment(R.layout.fragment_call) {
                         setAcceptClickListener()
                         setRejectClickListener()
                     }
+                    is CallServiceEvent.NeedToRestartService -> {
+                        (activity as MainActivity).stopCallService()
+                        (activity as MainActivity).startCallService()
+                        (activity as MainActivity).bindCallService(vm.getCallServiceConnection())
+                    }
                 }
             }
         }
@@ -195,7 +200,7 @@ class CallFragment: Fragment(R.layout.fragment_call) {
 
     override fun onResume() {
         super.onResume()
-        (activity as MainActivity).bindRTCService(vm.getCallServiceConnection())
+        (activity as MainActivity).bindCallService(vm.getCallServiceConnection())
     }
 
     override fun onDestroyView() {

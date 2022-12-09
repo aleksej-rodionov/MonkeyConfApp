@@ -19,6 +19,7 @@ import com.example.neopidorapp.models.MessageModel
 import com.example.neopidorapp.util.Constants
 import com.example.neopidorapp.util.Constants.TAG_DEBUG
 import com.example.neopidorapp.util.Constants.TAG_END_CALL
+import com.example.neopidorapp.util.Constants.TAG_PEER_CONNECTION_OUTPUT
 import com.example.neopidorapp.util.Constants.TAG_SOCKET
 import com.google.gson.Gson
 import dagger.hilt.android.AndroidEntryPoint
@@ -147,7 +148,7 @@ class CallService : Service(), NotificationCallback {
                         }
                     }
                     "offer_received" -> {
-                        recreateRTCClient()
+                        recreateRTCClient() // todo try to remove it if restarting service solve the problems
                         updateIsIncomingCall(true)
                         updateCallerName(socketMessage.name ?: "")
                         rtcState.updateIncomingOfferMessageData(socketMessage.data) // RTCdata
@@ -301,7 +302,7 @@ class CallService : Service(), NotificationCallback {
     }
 
     fun onCallButtonClick(username: String?, targetName: String?) {
-        recreateRTCClient()
+        recreateRTCClient() // todo try to remove it if restarting service solve the problems
         sendMessageToSocket( // not needed when implement pushes, replace with smth else.
             MessageModel(
                 "start_call",
@@ -316,31 +317,41 @@ class CallService : Service(), NotificationCallback {
         Log.d(TAG_END_CALL, "onEndCallBtnClick")
 
         remoteMediaStream?.videoTracks?.get(0)?.removeSink(remoteView)
-//        remoteMediaStream?.videoTracks?.forEach {
-//            it.
-//        }
+        remoteMediaStream?.dispose()
+        remoteMediaStream = null
 
         closePeerConnection()
         sendMessageToSocket(MessageModel("end_call", myUsername, _targetName, null))
         resetPeerConnectionObserver()
         localView?.let { lv -> remoteView?.let { rv -> releaseSurfaceViews(lv, rv) } }
         setViewsToDefaultStateAfterEndingCall()
-        recreateRTCClient()
+
+//        recreateRTCClient() // todo try to remove it if restarting service solve the problems
+        rtcClientWrapper.nullizeRTCClient()
+
+        callServiceScope.launch {
+            _callServiceEvent.emit(CallServiceEvent.NeedToRestartService)
+        }
     }
 
     private fun onReceiveEndCall() {
         Log.d(TAG_END_CALL, "onReceiveEndCall")
 
         remoteMediaStream?.videoTracks?.get(0)?.removeSink(remoteView)
-//        remoteMediaStream?.videoTracks?.forEach {
-//            it.
-//        }
+        remoteMediaStream?.dispose()
+        remoteMediaStream = null
 
         closePeerConnection()
         localView?.let { lv -> remoteView?.let { rv -> releaseSurfaceViews(lv, rv) } }
         resetPeerConnectionObserver()
         setViewsToDefaultStateAfterEndingCall()
-        recreateRTCClient()
+
+//        recreateRTCClient() // todo try to remove it if restarting service solve the problems
+        rtcClientWrapper.nullizeRTCClient()
+
+        callServiceScope.launch {
+            _callServiceEvent.emit(CallServiceEvent.NeedToRestartService)
+        }
     }
 
     private fun closePeerConnection() {
@@ -394,13 +405,12 @@ class CallService : Service(), NotificationCallback {
         updateTargetName(_callerName)
     }
 
-    fun initPeerConnectionObserver() { // todo move to the Service?
+    fun initPeerConnectionObserver() {
         peerConnectionObserver = object : PeerConnectionObserver() {
 
-
-
+            // todo remove this block if sure it's redundant
             override fun onIceConnectionChange(p0: PeerConnection.IceConnectionState?) {
-                Log.d(Constants.TAG_PEER_CONNECTION_OUTPUT, "onIceConnectionChange: newState = $p0")
+                Log.d(TAG_PEER_CONNECTION_OUTPUT, "onIceConnectionChange: newState = $p0")
                 super.onIceConnectionChange(p0)
 
                 if (p0 == PeerConnection.IceConnectionState.DISCONNECTED) {
@@ -411,11 +421,13 @@ class CallService : Service(), NotificationCallback {
 //                    rtcClientWrapper.killPeerConnection()
 
                     // todo call nullizeRTCClient() ???
+                    Log.d(TAG_PEER_CONNECTION_OUTPUT, "onIceConnectionChange: state = DISCONNECTED")
+//                    onReceiveEndCall()
                 }
             }
 
             override fun onIceCandidate(p0: IceCandidate?) {
-                Log.d(Constants.TAG_PEER_CONNECTION_OUTPUT, "onIceCandidate: ${p0.toString()}")
+                Log.d(TAG_PEER_CONNECTION_OUTPUT, "onIceCandidate: ${p0.toString()}")
 
                 super.onIceCandidate(p0)
                 addIceCandidate(p0)
@@ -436,7 +448,7 @@ class CallService : Service(), NotificationCallback {
             }
 
             override fun onAddStream(p0: MediaStream?) {
-                Log.d(Constants.TAG_PEER_CONNECTION_OUTPUT, "onAddStream(remote): ${p0.toString()}")
+                Log.d(TAG_PEER_CONNECTION_OUTPUT, "onAddStream(remote): ${p0.toString()}")
                 super.onAddStream(p0)
 
 //                p0?.videoTracks?.get(0)?.addSink(remoteView)
@@ -459,6 +471,7 @@ sealed class CallServiceEvent {
     data class SnackbarMessage(val msg: String): CallServiceEvent()
     object TargetIsOnlineAndReadyToReceiveACall: CallServiceEvent()
     object CallOfferReceived: CallServiceEvent()
+    object NeedToRestartService: CallServiceEvent()
 }
 
 
