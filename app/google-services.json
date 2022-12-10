@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "576754297410",
+    "project_id": "neopidorapp",
+    "storage_bucket": "neopidorapp.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:576754297410:android:813c93c35010cd7f44dbdb",
+        "android_client_info": {
+          "package_name": "com.example.neopidorapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "576754297410-5mk2qq0scbve6c1rgpjgjqnvs8t6e28i.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDCYBSZJcyLcYdp92IrxWA4vUSvToKWDrQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "576754297410-5mk2qq0scbve6c1rgpjgjqnvs8t6e28i.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
