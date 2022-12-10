@@ -1,4 +1,4 @@
-package com.example.neopidorapp.feature_signin.presentation
+package com.example.neopidorapp.feature_auth.presentation
 
 import androidx.lifecycle.ViewModel
 import com.google.firebase.auth.FirebaseAuth

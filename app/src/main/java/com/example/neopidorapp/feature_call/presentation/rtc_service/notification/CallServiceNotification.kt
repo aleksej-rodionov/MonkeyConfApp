@@ -4,11 +4,9 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import androidx.core.app.NotificationCompat
-import androidx.navigation.NavDeepLinkBuilder
-import com.example.neopidorapp.MainActivity
+import com.example.neopidorapp.CallActivity
 import com.example.neopidorapp.NeoPidorApp
 import com.example.neopidorapp.R
-import com.example.neopidorapp.feature_call.presentation.call.CallFragmentArgs
 import com.example.neopidorapp.feature_call.presentation.rtc_service.CallService
 import com.example.neopidorapp.feature_call.presentation.rtc_service.rtc_ui_state.RTCUiState
 import kotlinx.coroutines.CoroutineScope
@@ -43,7 +41,7 @@ class CallServiceNotification(
 
     override fun showRtcNotification(state: RTCUiState) {
 
-        val activityIntent = Intent(callService, MainActivity::class.java)
+        val activityIntent = Intent(callService, CallActivity::class.java)
         activityIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
         activityIntent.putExtra("openFragment", "callFragment");
         activityIntent.putExtra("myUsername", callService.myUsername);

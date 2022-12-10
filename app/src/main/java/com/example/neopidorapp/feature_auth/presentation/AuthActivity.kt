@@ -1,4 +1,4 @@
-package com.example.neopidorapp.feature_signin.presentation
+package com.example.neopidorapp.feature_auth.presentation
 
 import android.os.Bundle
 import androidx.activity.viewModels

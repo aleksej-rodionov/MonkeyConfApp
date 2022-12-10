@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".feature_signin.presentation.AuthActivity">
+    tools:context=".feature_auth.presentation.AuthActivity">
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/fragmentContainerAuth"
@@ -16,6 +16,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:navGraph="@navigation/nav_graph" />
+        app:navGraph="@navigation/nav_graph_auth" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

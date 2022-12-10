@@ -1,4 +1,4 @@
-package com.example.neopidorapp.feature_signin.presentation.new_password
+package com.example.neopidorapp.feature_auth.presentation.new_password
 
 import android.os.Bundle
 import android.view.View
@@ -6,7 +6,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.example.neopidorapp.R
 import com.example.neopidorapp.databinding.FragmentNewPasswordBinding
-import com.example.neopidorapp.feature_signin.presentation.AuthViewModel
+import com.example.neopidorapp.feature_auth.presentation.AuthViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint

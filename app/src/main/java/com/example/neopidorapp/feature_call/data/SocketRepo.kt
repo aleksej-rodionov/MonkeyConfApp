@@ -1,11 +1,9 @@
 package com.example.neopidorapp.feature_call.data
 
 import android.util.Log
-import com.example.neopidorapp.models.MessageModel
+import com.example.neopidorapp.feature_call.domain.model.MessageModel
 import com.example.neopidorapp.util.Constants.TAG_DEBUG
 import com.example.neopidorapp.util.Constants.TAG_SOCKET
-import com.example.neopidorapp.util.currentThreadName
-import com.example.neopidorapp.util.isCurrentThreadMain
 import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableSharedFlow

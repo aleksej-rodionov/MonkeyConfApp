@@ -1,12 +1,10 @@
 package com.example.neopidorapp.feature_call.presentation.rtc_service
 
-import android.app.Application
 import android.app.Service
 import android.content.Intent
 import android.os.Binder
 import android.os.IBinder
 import android.util.Log
-import androidx.navigation.NavDeepLinkBuilder
 import com.example.neopidorapp.feature_call.data.SocketRepo
 import com.example.neopidorapp.feature_call.presentation.rtc_service.notification.NotificationCallback
 import com.example.neopidorapp.feature_call.presentation.rtc_service.notification.CallServiceNotification
@@ -15,9 +13,8 @@ import com.example.neopidorapp.feature_call.presentation.rtc_service.rtc_client.
 import com.example.neopidorapp.feature_call.presentation.rtc_service.rtc_client.RTCAudioManager
 import com.example.neopidorapp.feature_call.presentation.rtc_service.rtc_client.RTCClientWrapper
 import com.example.neopidorapp.feature_call.presentation.rtc_service.rtc_ui_state.RTCState
-import com.example.neopidorapp.models.IceCandidateModel
-import com.example.neopidorapp.models.MessageModel
-import com.example.neopidorapp.util.Constants
+import com.example.neopidorapp.feature_call.domain.model.IceCandidateModel
+import com.example.neopidorapp.feature_call.domain.model.MessageModel
 import com.example.neopidorapp.util.Constants.TAG_DEBUG
 import com.example.neopidorapp.util.Constants.TAG_END_CALL
 import com.example.neopidorapp.util.Constants.TAG_PEER_CONNECTION_OUTPUT

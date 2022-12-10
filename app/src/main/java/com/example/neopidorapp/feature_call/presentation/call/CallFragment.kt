@@ -8,13 +8,11 @@ import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
-import com.example.neopidorapp.MainActivity
+import com.example.neopidorapp.CallActivity
 import com.example.neopidorapp.R
 import com.example.neopidorapp.databinding.FragmentCallBinding
 import com.example.neopidorapp.feature_call.presentation.rtc_service.CallService
 import com.example.neopidorapp.feature_call.presentation.rtc_service.CallServiceEvent
-import com.example.neopidorapp.util.Constants
-import com.example.neopidorapp.util.Constants.TAG_BACKSTACK
 import com.example.neopidorapp.util.Constants.TAG_HASHCODE
 import com.example.neopidorapp.util.Constants.TAG_SERVICE
 import com.google.android.material.snackbar.Snackbar
@@ -152,9 +150,9 @@ class CallFragment: Fragment(R.layout.fragment_call) {
                     }
                     is CallServiceEvent.NeedToRestartService -> {
                         Log.d(TAG_SERVICE, "Event.NeedToRestartService: ")
-                        (activity as MainActivity).stopCallService()
-                        (activity as MainActivity).startCallService()
-                        (activity as MainActivity).bindCallService(vm.getCallServiceConnection())
+                        (activity as CallActivity).stopCallService()
+                        (activity as CallActivity).startCallService()
+                        (activity as CallActivity).bindCallService(vm.getCallServiceConnection())
                     }
                 }
             }
@@ -204,7 +202,7 @@ class CallFragment: Fragment(R.layout.fragment_call) {
 
     override fun onResume() {
         super.onResume()
-        (activity as MainActivity).bindCallService(vm.getCallServiceConnection())
+        (activity as CallActivity).bindCallService(vm.getCallServiceConnection())
 
         Log.d(TAG_HASHCODE, "onResume: fragmentHashcode = ${this.hashCode()}")
     }

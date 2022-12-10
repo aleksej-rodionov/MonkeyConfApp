@@ -1,4 +1,4 @@
-package com.example.neopidorapp.models
+package com.example.neopidorapp.feature_call.domain.model
 
 data class MessageModel(
     val type: String,

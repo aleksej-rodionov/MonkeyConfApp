@@ -3,11 +3,10 @@ package com.example.neopidorapp.feature_call.presentation.rtc_service.rtc_client
 import android.app.Application
 import android.util.Log
 import com.example.neopidorapp.feature_call.data.SocketRepo
-import com.example.neopidorapp.models.MessageModel
+import com.example.neopidorapp.feature_call.domain.model.MessageModel
 import com.example.neopidorapp.util.Constants.TAG_DEBUG
 import com.example.neopidorapp.util.Constants.TAG_PEER_CONNECTION_BASE
 import com.example.neopidorapp.util.Constants.TAG_PEER_CONNECTION_INPUT
-import com.example.neopidorapp.util.Constants.TAG_PEER_CONNECTION_OUTPUT
 import kotlinx.coroutines.CoroutineScope
 import org.webrtc.*
 
