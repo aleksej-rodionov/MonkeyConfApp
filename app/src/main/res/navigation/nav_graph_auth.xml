@@ -1,6 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/nav_graph_auth">
+    android:id="@+id/nav_graph_auth"
+    app:startDestination="@id/signupFragment">
 
+    <fragment
+        android:id="@+id/signupFragment"
+        android:name="com.example.neopidorapp.feature_signin.presentation.signup.SignupFragment"
+        android:label="SignupFragment" >
+        <action
+            android:id="@+id/action_signupFragment_to_loginFragment"
+            app:destination="@id/loginFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/loginFragment"
+        android:name="com.example.neopidorapp.feature_signin.presentation.login.LoginFragment"
+        android:label="LoginFragment" >
+        <action
+            android:id="@+id/action_loginFragment_to_newPasswordFragment"
+            app:destination="@id/newPasswordFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/newPasswordFragment"
+        android:name="com.example.neopidorapp.feature_signin.presentation.new_password.NewPasswordFragment"
+        android:label="NewPasswordFragment" />
 </navigation>
