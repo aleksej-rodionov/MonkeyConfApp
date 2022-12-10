@@ -32,6 +32,11 @@ class AuthActivity: AppCompatActivity() {
         navController = navHost.navController
 
         initObservers()
+
+        val straightToLogin = intent.getBooleanExtra("straightToLogin", false)
+        if (straightToLogin) {
+            viewModel.alreadyRegisteredClick()
+        }
     }
 
     override fun onSupportNavigateUp(): Boolean {

@@ -63,8 +63,16 @@
             android:layout_below="@id/callBtn"
             android:layout_marginHorizontal="30dp"
             android:layout_marginTop="32dp"
-            android:text="call"
+            android:text="Logout"
             android:id="@+id/btnLogout"/>
+        <androidx.appcompat.widget.AppCompatButton
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_below="@id/btnLogout"
+            android:layout_marginHorizontal="30dp"
+            android:layout_marginTop="32dp"
+            android:text="Delete me"
+            android:id="@+id/btnDeleteMe"/>
     </RelativeLayout>
     <RelativeLayout
         android:layout_width="match_parent"

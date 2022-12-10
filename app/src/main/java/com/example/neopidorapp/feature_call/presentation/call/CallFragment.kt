@@ -1,5 +1,6 @@
 package com.example.neopidorapp.feature_call.presentation.call
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -11,6 +12,7 @@ import androidx.lifecycle.lifecycleScope
 import com.example.neopidorapp.CallActivity
 import com.example.neopidorapp.R
 import com.example.neopidorapp.databinding.FragmentCallBinding
+import com.example.neopidorapp.feature_auth.presentation.AuthActivity
 import com.example.neopidorapp.feature_call.presentation.rtc_service.CallService
 import com.example.neopidorapp.feature_call.presentation.rtc_service.CallServiceEvent
 import com.example.neopidorapp.util.Constants.TAG_HASHCODE
@@ -84,6 +86,19 @@ class CallFragment: Fragment(R.layout.fragment_call) {
 
                     audioOutputButton.setImageResource(if (state.isSpeakerMode) R.drawable.ic_baseline_speaker_up_24
                     else R.drawable.ic_baseline_hearing_24)
+                }
+            }
+        }
+
+        viewLifecycleOwner.lifecycleScope.launchWhenStarted {
+            vm.callScreenEvent.collectLatest { event ->
+                when (event) {
+                    is CallScreenEvent.SnackMessage -> {
+                        Snackbar.make(binding.root, event.msg, Snackbar.LENGTH_SHORT).show()
+                    }
+                    is CallScreenEvent.ToAuth -> {
+                        (activity as CallActivity).toAuthActivity(event.straightToLoginScreen)
+                    }
                 }
             }
         }
@@ -197,6 +212,18 @@ class CallFragment: Fragment(R.layout.fragment_call) {
                 callService?.onEndCallBtnClick()
             }
             //====================RTC VIEW CONTROL BUTTONS END====================
+
+
+
+            //====================AUTH====================
+            btnLogout.setOnClickListener {
+                vm.onLogoutClick()
+            }
+
+            btnDeleteMe.setOnClickListener {
+                vm.onDeleteMeClick()
+            }
+            //====================AUTH END====================
         }
     }
 

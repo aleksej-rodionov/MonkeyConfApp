@@ -10,6 +10,7 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import com.example.neopidorapp.databinding.ActivityMainBinding
+import com.example.neopidorapp.feature_auth.presentation.AuthActivity
 import com.example.neopidorapp.feature_call.presentation.name.NameFragmentDirections
 import com.example.neopidorapp.feature_call.presentation.rtc_service.CallService
 import com.example.neopidorapp.util.Constants.TAG_DEBUG
@@ -87,4 +88,13 @@ class CallActivity : AppCompatActivity() {
         stopService(Intent(this, CallService::class.java))
     }
     //====================RTC SERVICE END====================
+
+
+
+    fun toAuthActivity(straightToLogin: Boolean) {
+        val intent = Intent(this, AuthActivity::class.java)
+        intent.putExtra("straightToLogin", straightToLogin)
+        startActivity(intent)
+        finish()
+    }
 }

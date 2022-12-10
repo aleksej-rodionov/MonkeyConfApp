@@ -106,7 +106,23 @@ class AuthViewModel @Inject constructor(
 
 
     //====================NEW PASSWORD SCREEN====================
+    var emailNewPassword = ""
 
+    fun onResetPasswordClick() {
+        if (emailNewPassword.isBlank()) {
+            emitAuthEvent(AuthEvent.SnackbarMessage("Enter email"))
+            return
+        }
+
+        firebaseAuth.sendPasswordResetEmail(emailNewPassword)
+            .addOnCompleteListener {
+                if (it.isSuccessful) {
+                    emitAuthEvent(AuthEvent.SnackbarMessage("Password reset link has been sent to your email"))
+                } else {
+                    emitAuthEvent(AuthEvent.SnackbarMessage("Mail sending error"))
+                }
+            }
+    }
     //====================NEW PASSWORD SCREEN END====================
 
 

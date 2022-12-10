@@ -2,6 +2,7 @@ package com.example.neopidorapp.feature_auth.presentation.new_password
 
 import android.os.Bundle
 import android.view.View
+import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.example.neopidorapp.R
@@ -21,21 +22,26 @@ class NewPasswordFragment: Fragment(R.layout.fragment_new_password) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentNewPasswordBinding.bind(view)
 
-        initObserver()
         initListeners()
     }
 
-    private fun initObserver() {
-        // todo
-    }
+
 
     private fun initListeners() {
-        // todo
+        binding.apply {
+            etEmail.addTextChangedListener {
+                viewModel.emailNewPassword = it.toString()
+            }
+
+            btnSubmitNewPassword.setOnClickListener {
+                viewModel.onResetPasswordClick()
+            }
+        }
     }
 
     override fun onResume() {
         super.onResume()
-//        binding // todo set values from vm to editText-s
+        binding.etEmail.setText(viewModel.emailNewPassword)
     }
 
     override fun onDestroyView() {
