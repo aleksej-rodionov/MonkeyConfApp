@@ -7,21 +7,15 @@
     <fragment
         android:id="@+id/signupFragment"
         android:name="com.example.neopidorapp.feature_auth.presentation.signup.SignupFragment"
-        android:label="SignupFragment" >
-        <action
-            android:id="@+id/action_signupFragment_to_loginFragment"
-            app:destination="@id/loginFragment" />
-    </fragment>
+        android:label="SignupFragment" />
     <fragment
         android:id="@+id/loginFragment"
         android:name="com.example.neopidorapp.feature_auth.presentation.login.LoginFragment"
-        android:label="LoginFragment" >
-        <action
-            android:id="@+id/action_loginFragment_to_newPasswordFragment"
-            app:destination="@id/newPasswordFragment" />
-    </fragment>
+        android:label="LoginFragment" />
     <fragment
         android:id="@+id/newPasswordFragment"
         android:name="com.example.neopidorapp.feature_auth.presentation.new_password.NewPasswordFragment"
         android:label="NewPasswordFragment" />
+    <action android:id="@+id/action_global_loginFragment" app:destination="@id/loginFragment" />
+    <action android:id="@+id/action_global_newPasswordFragment" app:destination="@id/newPasswordFragment" />
 </navigation>
