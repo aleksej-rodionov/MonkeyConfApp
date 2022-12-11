@@ -12,4 +12,12 @@ object Constants {
     const val TAG_BACKSTACK = "TAG_BACKSTACK"
     const val TAG_SERVICE = "TAG_SERVICE"
     const val TAG_HASHCODE = "TAG_HASHCODE"
+
+    const val TAG_AUTH = "TAG_AUTH"
+    const val TAG_FCM = "TAG_FCM"
+
+
+
+    const val SHARED_PREF_NAME = "NEOPIDOR_PREF"
+    const val FCM_TOKEN_KEY = "FCM_TOKEN_KEY"
 }

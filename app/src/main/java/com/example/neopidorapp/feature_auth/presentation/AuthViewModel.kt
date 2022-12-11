@@ -1,7 +1,9 @@
 package com.example.neopidorapp.feature_auth.presentation
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.neopidorapp.util.Constants.TAG_AUTH
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.common.api.GoogleApiClient
 import com.google.firebase.auth.FirebaseAuth
@@ -45,12 +47,18 @@ class AuthViewModel @Inject constructor(
             return
         }
 
+        if (passwordSignup.length < 6) {
+            emitAuthEvent(AuthEvent.SnackbarMessage("Password has to be not shorter tha 6 characters"))
+            return
+        }
+
         firebaseAuth.createUserWithEmailAndPassword(emailSignup, passwordSignup)
             .addOnCompleteListener {
                 if (it.isSuccessful) {
                     _authState.value = authState.value.copy(isLoggedIn = true)
                 } else {
-                    emitAuthEvent(AuthEvent.SnackbarMessage("Something went wrong O_o"))
+                    emitAuthEvent(AuthEvent.SnackbarMessage(it.exception?.message ?: "Unknown exception"))
+                    Log.d(TAG_AUTH, it.exception?.message ?: "Unknown exception")
                 }
             }
     }
@@ -82,7 +90,8 @@ class AuthViewModel @Inject constructor(
                 if (it.isSuccessful) {
                     _authState.value = authState.value.copy(isLoggedIn = true)
                 } else {
-                    emitAuthEvent(AuthEvent.SnackbarMessage("Something went wrong O_o"))
+                    emitAuthEvent(AuthEvent.SnackbarMessage(it.exception?.message ?: "Unknown exception"))
+                    Log.d(TAG_AUTH, it.exception?.message ?: "Unknown exception")
                 }
             }
     }
@@ -93,7 +102,8 @@ class AuthViewModel @Inject constructor(
             if (it.isSuccessful) {
                 _authState.value = authState.value.copy(isLoggedIn = true)
             } else {
-                emitAuthEvent(AuthEvent.SnackbarMessage("Auth error"))
+                emitAuthEvent(AuthEvent.SnackbarMessage(it.exception?.message ?: "Unknown exception"))
+                Log.d(TAG_AUTH, it.exception?.message ?: "Unknown exception")
             }
         }
     }
@@ -119,7 +129,8 @@ class AuthViewModel @Inject constructor(
                 if (it.isSuccessful) {
                     emitAuthEvent(AuthEvent.SnackbarMessage("Password reset link has been sent to your email"))
                 } else {
-                    emitAuthEvent(AuthEvent.SnackbarMessage("Mail sending error"))
+                    emitAuthEvent(AuthEvent.SnackbarMessage(it.exception?.message ?: "Unknown exception"))
+                    Log.d(TAG_AUTH, it.exception?.message ?: "Unknown exception")
                 }
             }
     }
