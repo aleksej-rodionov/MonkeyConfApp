@@ -26,11 +26,9 @@ class SocketRepo(
     }
 
     private var webSocket: WebSocketClient? = null
-    private var userName: String? = null
     private val gson = Gson()
 
-    fun initSocket(username: String) {
-        userName = username
+    fun initSocket() {
 
         // for emulators: 10.0.2.2:3000
         // for real devices: IP of your internet connection + :3000
@@ -44,14 +42,7 @@ class SocketRepo(
 //        webSocket = object : WebSocketClient(URI("ws://thawing-everglades-71111.herokuapp.com/:3000")) {
         webSocket = object : WebSocketClient(URI("ws://192.168.16.103:3000")) {
             override fun onOpen(handshakedata: ServerHandshake?) {
-                sendMessageToSocket(
-                    MessageModel(
-                        "store_user",
-                        username,
-                        null,
-                        null
-                    )
-                )
+                Log.d(TAG_SOCKET, "onOpen: ")
             }
 
             override fun onMessage(message: String?) {

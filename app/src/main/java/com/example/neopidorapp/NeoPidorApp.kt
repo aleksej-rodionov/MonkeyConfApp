@@ -9,6 +9,7 @@ import android.os.Build
 import android.util.Log
 import androidx.core.app.NotificationManagerCompat
 import com.example.neopidorapp.feature_auth.domain.repository.AuthRepo
+import com.example.neopidorapp.feature_call.data.SocketRepo
 import com.example.neopidorapp.util.Constants.TAG_FCM
 import com.google.firebase.messaging.FirebaseMessaging
 import dagger.hilt.android.HiltAndroidApp
@@ -24,6 +25,9 @@ class NeoPidorApp: Application() {
 
     @Inject
     lateinit var authRepo: AuthRepo
+
+    @Inject
+    lateinit var socketRepo: SocketRepo
 
     override fun onCreate() {
         super.onCreate()
@@ -50,6 +54,8 @@ class NeoPidorApp: Application() {
                     }
                 }
             }
+
+        socketRepo.initSocket()
     }
 
 

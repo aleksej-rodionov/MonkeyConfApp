@@ -3,6 +3,8 @@ package com.example.neopidorapp.feature_auth.presentation
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.neopidorapp.feature_call.data.SocketRepo
+import com.example.neopidorapp.feature_call.domain.model.MessageModel
 import com.example.neopidorapp.util.Constants.TAG_AUTH
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.common.api.GoogleApiClient
@@ -16,7 +18,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AuthViewModel @Inject constructor(
-
+    private val socketRepo: SocketRepo
 ): ViewModel() {
 
     val firebaseAuth = FirebaseAuth.getInstance()
@@ -61,12 +63,24 @@ class AuthViewModel @Inject constructor(
         firebaseAuth.createUserWithEmailAndPassword(emailSignup, passwordSignup)
             .addOnCompleteListener {
                 if (it.isSuccessful) {
+                    // todo get FCMToken from firebase
+                    // todo make user(name, uid, fcmToken) and store_user at Server.js
+
                     _authState.value = authState.value.copy(isLoggedIn = true)
                 } else {
                     emitAuthEvent(AuthEvent.SnackbarMessage(it.exception?.message ?: "Unknown exception"))
                     Log.d(TAG_AUTH, it.exception?.message ?: "Unknown exception")
                 }
             }
+
+//        sendMessageToSocket(
+//            MessageModel(
+//                "store_user",
+//                username,
+//                null,
+//                null
+//            )
+//        )
     }
 
     fun alreadyRegisteredClick() {

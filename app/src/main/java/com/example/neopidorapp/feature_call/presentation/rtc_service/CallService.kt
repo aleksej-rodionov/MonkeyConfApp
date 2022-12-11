@@ -299,11 +299,11 @@ class CallService : Service(), NotificationCallback {
         username?.let { myUsername = it }
     }
 
-    fun initSocket(username: String?) {
-        username?.let { u ->
-            socketRepo.initSocket(u)
-        }
-    }
+//    fun initSocket(username: String?) {
+//        username?.let { u ->
+//            socketRepo.initSocket(u)
+//        }
+//    }
 
     fun onCallButtonClick(username: String?, targetName: String?) {
         recreateRTCClient() // todo try to remove it if restarting service solve the problems

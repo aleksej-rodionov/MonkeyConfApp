@@ -110,7 +110,7 @@ class CallFragment: Fragment(R.layout.fragment_call) {
                     Log.d(TAG_HASHCODE, "onResume: it.service Hashcode = ${it.service.hashCode()}")
                     Log.d(TAG_HASHCODE, "onResume: callService Hashcode = ${callService?.hashCode() ?: "null"}")
                     callService?.initUsername(vm.username)
-                    callService?.initSocket(vm.username)
+//                    callService?.initSocket(vm.username)
 //                    callService?.initPeerConnectionObserver()
 //                    callService?.initRtcClient()
                     initRTCStateCollector()
