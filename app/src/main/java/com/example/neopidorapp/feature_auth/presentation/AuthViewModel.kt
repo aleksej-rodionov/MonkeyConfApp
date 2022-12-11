@@ -33,10 +33,16 @@ class AuthViewModel @Inject constructor(
 
 
     //====================SIGNUP SCREEN====================
+    var usernameSignup = ""
     var emailSignup = ""
     var passwordSignup = ""
 
     fun onSignupClick() {
+        if (usernameSignup.isBlank()) {
+            emitAuthEvent(AuthEvent.SnackbarMessage("Enter username"))
+            return
+        }
+
         if (emailSignup.isBlank()) {
             emitAuthEvent(AuthEvent.SnackbarMessage("Enter email"))
             return

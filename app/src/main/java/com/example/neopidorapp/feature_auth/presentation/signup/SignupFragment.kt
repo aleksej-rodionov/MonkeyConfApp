@@ -27,6 +27,7 @@ class SignupFragment: Fragment(R.layout.fragment_signup) {
 
     override fun onResume() {
         super.onResume()
+        binding.name.setText(viewModel.usernameSignup)
         binding.email.setText(viewModel.emailSignup)
         binding.password.setText(viewModel.passwordSignup)
     }
@@ -38,6 +39,10 @@ class SignupFragment: Fragment(R.layout.fragment_signup) {
 
     private fun initListeners() {
         binding.apply {
+            name.addTextChangedListener {
+                viewModel.usernameSignup = it.toString()
+            }
+
             email.addTextChangedListener {
                 viewModel.emailSignup = it.toString()
             }
