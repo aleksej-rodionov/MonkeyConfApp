@@ -3,9 +3,17 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/rodio/AndroidStudioProjects/NeoPidorApp/app/src/main/res/drawable/ic_accept.xml" value="0.1585" />
         <entry key="..\:/Users/rodio/AndroidStudioProjects/NeoPidorApp/app/src/main/res/drawable/ic_baseline_hearing_24.xml" value="0.1255" />
         <entry key="..\:/Users/rodio/AndroidStudioProjects/NeoPidorApp/app/src/main/res/drawable/ic_baseline_speaker_up_24.xml" value="0.1255" />
         <entry key="..\:/Users/rodio/AndroidStudioProjects/NeoPidorApp/app/src/main/res/drawable/ic_reject.xml" value="0.1255" />
+        <entry key="..\:/Users/rodio/AndroidStudioProjects/NeoPidorApp/app/src/main/res/layout/activity_auth.xml" value="0.3651041666666667" />
+        <entry key="..\:/Users/rodio/AndroidStudioProjects/NeoPidorApp/app/src/main/res/layout/activity_main.xml" value="0.36614583333333334" />
+        <entry key="..\:/Users/rodio/AndroidStudioProjects/NeoPidorApp/app/src/main/res/layout/activity_splash.xml" value="0.22" />
+        <entry key="..\:/Users/rodio/AndroidStudioProjects/NeoPidorApp/app/src/main/res/layout/fragment_call.xml" value="0.20833333333333334" />
+        <entry key="..\:/Users/rodio/AndroidStudioProjects/NeoPidorApp/app/src/main/res/layout/fragment_login.xml" value="0.2953703703703704" />
+        <entry key="..\:/Users/rodio/AndroidStudioProjects/NeoPidorApp/app/src/main/res/layout/fragment_new_password.xml" value="0.2953703703703704" />
+        <entry key="..\:/Users/rodio/AndroidStudioProjects/NeoPidorApp/app/src/main/res/layout/fragment_signup.xml" value="0.3651041666666667" />
       </map>
     </option>
   </component>

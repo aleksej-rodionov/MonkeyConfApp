@@ -6,7 +6,7 @@
 
     <fragment
         android:id="@+id/nameFragment"
-        android:name="com.example.neopidorapp.feature_call.presentation.name.NameFragment"
+        android:name="com.example.monkeyconfapp.feature_call.presentation.name.NameFragment"
         android:label="NameFragment" >
         <action
             android:id="@+id/action_nameFragment_to_callFragment"
@@ -14,7 +14,7 @@
     </fragment>
     <fragment
         android:id="@+id/callFragment"
-        android:name="com.example.neopidorapp.feature_call.presentation.call.CallFragment"
+        android:name="com.example.monkeyconfapp.feature_call.presentation.call.CallFragment"
         android:label="CallFragment" >
         <argument
             android:name="username"
